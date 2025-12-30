@@ -1,7 +1,22 @@
 #include <Windows.h>
 #include <sal.h>
+#include <wingdi.h>
+#include <windowsx.h>
+
+constexpr INT ID_BITMAP = 101;
+
+#define global_var static
+#define local_persist static
+#define internal static
+
+global_var bool running;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+internal //Local to this file only
+void Win32ResizeDIBSection(int width, int height);
+internal
+void Win32UpdateWindow(HDC DeviceContext, int x, int y, int width, int height);
 
 int WINAPI WinMain(
 	_In_ HINSTANCE hInstance, 
@@ -45,6 +60,7 @@ int WINAPI WinMain(
 		TranslateMessage(&msg); //Always called before dispatch
 		DispatchMessage(&msg); //Alows the system to ignore or reply to the message
 	}
+
 	return 0;
 }
 
@@ -52,15 +68,51 @@ LRESULT WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
-		case WM_QUIT :
+		case WM_DESTROY :
 		{
 			PostQuitMessage(0);
-			return 0;
+		}break;
+		case WM_CLOSE :
+		{
+			DestroyWindow(hwnd);
+		}break;
+		case WM_SIZE :
+		{
+			RECT ClientRect;
+			GetClientRect(hwnd, &ClientRect);
+			int width = ClientRect.right - ClientRect.left;
+			int height = ClientRect.bottom - ClientRect.top;
+			Win32ResizeDIBSection(width, height);
+			break;
 		}
-		break;
+		case WM_PAINT :
+		{
+			PAINTSTRUCT Paint;
+			HDC DeviceContext = BeginPaint(hwnd, &Paint);
+			int x = Paint.rcPaint.left;
+			int y = Paint.rcPaint.top;
+			int width = Paint.rcPaint.right - Paint.rcPaint.left;
+			int height = Paint.rcPaint.bottom - Paint.rcPaint.top;
+			local_persist DWORD Operation = WHITENESS;
+			PatBlt(DeviceContext, x, y, width, height, Operation);
+			if (Operation == WHITENESS)
+			{
+				Operation = BLACKNESS;
+			}
+			else
+			{
+				Operation = WHITENESS;
+			}
+			EndPaint(hwnd, &Paint);
+			break;
+		}
 	}
 
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
+void Win32ResizeDIBSection(int width, int height)
+{
+
+}
 
