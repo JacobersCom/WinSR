@@ -10,6 +10,16 @@ constexpr INT ID_BITMAP = 101;
 #define internal static
 
 global_var bool running;
+global_var BITMAPINFO BitMapInfo;
+global_var void* BitMapMemory;
+global_var HBITMAP BitMapHandle;
+global_var HDC BitMapDeviceContext;
+
+struct DibSectionResutls
+{
+	HBITMAP handle;
+	void* Memory;
+};
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -95,14 +105,7 @@ LRESULT WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			int height = Paint.rcPaint.bottom - Paint.rcPaint.top;
 			local_persist DWORD Operation = WHITENESS;
 			PatBlt(DeviceContext, x, y, width, height, Operation);
-			if (Operation == WHITENESS)
-			{
-				Operation = BLACKNESS;
-			}
-			else
-			{
-				Operation = WHITENESS;
-			}
+			Win32UpdateWindow(DeviceContext, x, y, width, height);
 			EndPaint(hwnd, &Paint);
 			break;
 		}
@@ -111,8 +114,41 @@ LRESULT WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
+
 void Win32ResizeDIBSection(int width, int height)
 {
+	if (BitMapHandle)
+	{
+		DeleteObject(BitMapHandle);
+	}
 
+	if (!BitMapDeviceContext)
+	{
+		BitMapDeviceContext = CreateCompatibleDC(0);
+	}
+
+	BitMapInfo.bmiHeader.biSize = sizeof(BitMapInfo.bmiHeader);
+	BitMapInfo.bmiHeader.biWidth = width;
+	BitMapInfo.bmiHeader.biHeight = height;
+	BitMapInfo.bmiHeader.biPlanes = 1;
+	BitMapInfo.bmiHeader.biBitCount = 32; //bit count prepixel
+	BitMapInfo.bmiHeader.biCompression = BI_RGB;
+
+	BitMapHandle = CreateDIBitmap(BitMapDeviceContext, &BitMapInfo.bmiHeader, DIB_RGB_COLORS, &BitMapMemory, &BitMapInfo, 0);
+
+	
+}
+
+void Win32UpdateWindow(HDC DeviceContext, int x, int y, int width, int height)
+{
+	//Rect to rect image copy, if the des is bigger the image is increased
+	StretchDIBits(
+		DeviceContext,
+		x, y, width, height,
+		x, y, width, height,
+		BitMapMemory, 
+		&BitMapInfo,
+		DIB_RGB_COLORS, SRCCOPY
+	);
 }
 
