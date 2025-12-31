@@ -1,9 +1,5 @@
 #include <Windows.h>
-#include <sal.h>
-#include <wingdi.h>
-#include <windowsx.h>
 
-constexpr INT ID_BITMAP = 101;
 
 #define global_var static
 #define local_persist static
