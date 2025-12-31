@@ -194,20 +194,13 @@ void Renderfun(int _x, int _y)
 	}
 }
 
-void PixelPlot(int x, int y, uint32_t colorARGB)
+void PixelPlot(int x, int y, uint32_t color)
 {
-	// 1) Bounds check so you don't scribble into random memory
-	if (x < 0 || x >= BitMapWidth || y < 0 || y >= BitMapHeight) return;
-
-	// 2) Compute the address of the start of row y in BYTES
-	uint8_t* base = (uint8_t*)BitMapMemory;
-	int      pitch = BitMapWidth * 4;
-	uint8_t* row = base + y * pitch;
-
-	// 3) Move to pixel x in BYTES (x * 4 for 32bpp)
-	uint32_t* pixel = (uint32_t*)(row + x * 4);
-
-	// 4) Write the whole pixel in one shot.
-	// If you pass 0xAARRGGBB, little-endian memory becomes BB GG RR AA (BGRA), which is what Windows expects.
-	*pixel = colorARGB;
+	uint8_t* Row = (uint8_t*)BitMapMemory;
+	uint32_t point = y * (BytePrePixel * BitMapWidth) + x;
+	uint8_t* Pixel = Row + point;
+	*Pixel = (uint8_t) color;
+	Pixel++; color++;
+	*Pixel = (int8_t)color;
+	Pixel++; color++;
 }
