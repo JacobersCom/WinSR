@@ -196,11 +196,16 @@ void Renderfun(int _x, int _y)
 
 void PixelPlot(int x, int y, uint32_t color)
 {
-	uint8_t* Row = (uint8_t*)BitMapMemory;
-	uint32_t point = y * (BytePrePixel * BitMapWidth) + x;
-	uint8_t* Pixel = Row + point;
-	*Pixel = (uint8_t) color;
-	Pixel++; color++;
-	*Pixel = (int8_t)color;
-	Pixel++; color++;
+	//Where the bitmap is in memory
+	uint8_t* Page = (uint8_t*)BitMapMemory;
+	//Lenght per stride/row
+	uint32_t pitch = BytePrePixel * BitMapWidth;
+
+	//The Y position 
+	uint8_t* Row = Page + y * pitch;
+
+	//The X position. 
+	uint32_t* Pixel = (uint32_t*)(Row + x * 4);
+
+	*Pixel = color;
 }
