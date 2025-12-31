@@ -12,6 +12,7 @@ global_var bool running;
 global_var BITMAPINFO BitMapInfo;
 //Using a void* to repersent new allocated memory
 global_var void* BitMapMemory;
+global_var int BytePrePixel;
 global_var int BitMapWidth;
 global_var int BitMapHeight;
 
@@ -23,7 +24,7 @@ void Win32ResizeDIBSection(int width, int height);
 internal //Local to this file only
 void Win32UpdateWindow(HDC DeviceContext, RECT* ClientRECT);
 internal
-void ErrorExit();
+void Renderfun(int x, int y);
 
 
 int WINAPI WinMain(
@@ -47,7 +48,7 @@ int WINAPI WinMain(
 		className, //window class name
 		L"Raster Surface", //Window title
 		WS_OVERLAPPEDWINDOW, // Window style
-		CW_USEDEFAULT, CW_USEDEFAULT, 700, 700, //Size and position
+		CW_USEDEFAULT, CW_USEDEFAULT, 1024, 700, //Size and position
 		NULL, //Parent window
 		NULL, //Meun
 		hInstance, //Instance handler
@@ -128,46 +129,14 @@ void Win32ResizeDIBSection(int width, int height)
 	BitMapInfo.bmiHeader.biCompression = BI_RGB;
 
 	//Amount of bytes prepixel
-	int BytesPrePixel = 4;
+	BytePrePixel = 4;
 	//total pixels of rect 
-	unsigned int BitMapMemorySize = BytesPrePixel * (BitMapWidth * BitMapHeight);
+	unsigned int BitMapMemorySize = BytePrePixel * (BitMapWidth * BitMapHeight);
 	//Using MEM_COMMIT and MEM_RESERVE to commit the page to memory for later reading/writing
 	//which is what page_readwrite is for
 	BitMapMemory = VirtualAlloc(0, BitMapMemorySize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 	
-	uint32_t pitch = width * BytesPrePixel;
-	uint8_t* Row = (uint8_t*) BitMapMemory;
-
-
-	for (int y = 0; y < BitMapHeight; ++y)
-	{
-		//Point Pixel at current row
-		uint8_t* Pixel = (uint8_t*)Row;
-
-		for (int x = 0; x < BitMapWidth; ++x)
-		{
-			//Move to next pixel
-
-			//Red byte 0 
-			*Pixel = 0xFF;
-			//Move one byte
-			++Pixel;
-
-			//Blue byte 1
-			*Pixel = 0x00;
-			++Pixel;
-
-			//Green Byte 2
-			*Pixel = 0x00;
-			++Pixel;
-
-			//Alpha Byte 3
-			*Pixel = 0x00;
-			++Pixel;
-		}
-		//Going to the next "Row"
-		Row += pitch;
-	}
+	Renderfun(128, 0);
 	
 }
 
@@ -185,6 +154,43 @@ void Win32UpdateWindow(HDC DeviceContext, RECT* ClientRECT)
 		&BitMapInfo,
 		DIB_RGB_COLORS, SRCCOPY
 	);
+}
+
+void Renderfun(int _x, int _y)
+{
+	uint32_t pitch = BitMapWidth * BytePrePixel;
+	uint8_t* Row = (uint8_t*)BitMapMemory;
+
+
+	for (int y = 0; y < BitMapHeight; ++y)
+	{
+		//Point Pixel at current row
+		uint8_t* Pixel = (uint8_t*)Row;
+
+		for (int x = 0; x < BitMapWidth; ++x)
+		{
+			//Move to next pixel
+
+			//Red byte 0 
+			*Pixel = (uint8_t)(x + _x);
+			//Move one byte
+			++Pixel;
+
+			//Blue byte 1
+			*Pixel = (uint8_t)(y +_y);
+			++Pixel;
+
+			//Green Byte 2
+			*Pixel = (uint8_t)Row;
+			++Pixel;
+
+			//Alpha Byte 3
+			*Pixel = 0;
+			++Pixel;
+		}
+		//Going to the next "Row"
+		Row += pitch;
+	}
 }
 
 
