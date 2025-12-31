@@ -26,9 +26,11 @@ void Win32UpdateWindow(HDC DeviceContext, RECT* ClientRECT);
 internal
 void Renderfun(int x, int y);
 internal
-void PixelPlot(int x, int y, uint32_t color);
+void PlotPixel(int x, int y, uint32_t color);
 internal
 void ParamertieLine(int x1, int y1, int x2, int y2, uint32_t color);
+internal
+uint32_t Lerp(int start, float ratio, int deltaStart) { return start + ratio * deltaStart; }
 
 int WINAPI WinMain(
 	_In_ HINSTANCE hInstance, 
@@ -197,7 +199,7 @@ void Renderfun(int _x, int _y)
 	}
 }
 
-void PixelPlot(int x, int y, uint32_t color)
+void PlotPixel(int x, int y, uint32_t color)
 {
 	//Where the bitmap is in memory
 	uint8_t* Page = (uint8_t*)BitMapMemory;
@@ -217,19 +219,16 @@ void ParamertieLine(int x1, int y1, int x2, int y2, uint32_t color)
 {
 	//What difference is greater?
 	uint32_t deltaX = (x2 - x1);
-
-
 	uint32_t deltaY = (y2 - y1);
-
-
 	uint32_t rateOfChange = deltaY > deltaX ? deltaY : deltaX;
 
-	for(int i = 0; i < rateOfChange; i++)
+	for(uint32_t i = 0; i < rateOfChange; i++)
 	{
+		//ratio
 		float r = (float)i / (float)rateOfChange;
-		uint32_t x = x1 + r * deltaX;
-		uint32_t y = y1 + r * deltaY;
-		PixelPlot(x, y, color);
+		//lerp
+		uint32_t x = Lerp(x1, r, deltaX);
+		uint32_t y = Lerp(x1, r, deltaY);
+		PlotPixel(x, y, color);
 	}
-
 }
