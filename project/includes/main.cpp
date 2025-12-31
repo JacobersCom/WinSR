@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <stdio.h >
+#include <stdint.h>
 
 
 #define global_var static
@@ -121,7 +122,7 @@ void Win32ResizeDIBSection(int width, int height)
 
 	BitMapInfo.bmiHeader.biSize = sizeof(BitMapInfo.bmiHeader);
 	BitMapInfo.bmiHeader.biWidth = BitMapWidth;
-	BitMapInfo.bmiHeader.biHeight = BitMapHeight;
+	BitMapInfo.bmiHeader.biHeight = -BitMapHeight;
 	BitMapInfo.bmiHeader.biPlanes = 1;
 	BitMapInfo.bmiHeader.biBitCount = 32; //bit count prepixel
 	BitMapInfo.bmiHeader.biCompression = BI_RGB;
@@ -129,10 +130,44 @@ void Win32ResizeDIBSection(int width, int height)
 	//Amount of bytes prepixel
 	int BytesPrePixel = 4;
 	//total pixels of rect 
-	int BitMapMemorySize = BytesPrePixel * (BitMapWidth * BitMapHeight);
+	unsigned int BitMapMemorySize = BytesPrePixel * (BitMapWidth * BitMapHeight);
 	//Using MEM_COMMIT and MEM_RESERVE to commit the page to memory for later reading/writing
 	//which is what page_readwrite is for
 	BitMapMemory = VirtualAlloc(0, BitMapMemorySize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+	
+	uint32_t pitch = width * BytesPrePixel;
+	uint8_t* Row = (uint8_t*) BitMapMemory;
+
+
+	for (int y = 0; y < BitMapHeight; ++y)
+	{
+		//Point Pixel at current row
+		uint8_t* Pixel = (uint8_t*)Row;
+
+		for (int x = 0; x < BitMapWidth; ++x)
+		{
+			//Move to next pixel
+
+			//Red byte 0 
+			*Pixel = 0xFF;
+			//Move one byte
+			++Pixel;
+
+			//Blue byte 1
+			*Pixel = 0x00;
+			++Pixel;
+
+			//Green Byte 2
+			*Pixel = 0x00;
+			++Pixel;
+
+			//Alpha Byte 3
+			*Pixel = 0x00;
+			++Pixel;
+		}
+		//Going to the next "Row"
+		Row += pitch;
+	}
 	
 }
 
