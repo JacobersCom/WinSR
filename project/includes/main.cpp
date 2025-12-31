@@ -1,4 +1,5 @@
 #include <Windows.h>
+#include <stdio.h >
 
 
 #define global_var static
@@ -7,22 +8,19 @@
 
 global_var bool running;
 global_var BITMAPINFO BitMapInfo;
+//Using a void* to repersent new allocated memory
 global_var void* BitMapMemory;
-global_var HBITMAP BitMapHandle;
-global_var HDC BitMapDeviceContext;
 
-struct DibSectionResutls
-{
-	HBITMAP handle;
-	void* Memory;
-};
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 internal //Local to this file only
 void Win32ResizeDIBSection(int width, int height);
-internal
+internal //Local to this file only
 void Win32UpdateWindow(HDC DeviceContext, int x, int y, int width, int height);
+internal
+void ErrorExit();
+
 
 int WINAPI WinMain(
 	_In_ HINSTANCE hInstance, 
@@ -112,26 +110,19 @@ LRESULT WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 
 void Win32ResizeDIBSection(int width, int height)
-{
-	if (BitMapHandle)
+{	
+	if (BitMapMemory)
 	{
-		DeleteObject(BitMapHandle);
+		VirtualFree(BitMapMemory, 0, MEM_RELEASE);
 	}
 
-	if (!BitMapDeviceContext)
-	{
-		BitMapDeviceContext = CreateCompatibleDC(0);
-	}
-
-	BitMapInfo.bmiHeader.biSize = sizeof(BitMapInfo.bmiHeader);
-	BitMapInfo.bmiHeader.biWidth = width;
-	BitMapInfo.bmiHeader.biHeight = height;
-	BitMapInfo.bmiHeader.biPlanes = 1;
-	BitMapInfo.bmiHeader.biBitCount = 32; //bit count prepixel
-	BitMapInfo.bmiHeader.biCompression = BI_RGB;
-
-	BitMapHandle = CreateDIBitmap(BitMapDeviceContext, &BitMapInfo.bmiHeader, DIB_RGB_COLORS, &BitMapMemory, &BitMapInfo, 0);
-
+	//Amount of bytes prepixel
+	int BytesPrePixel = 4;
+	//total pixels of rect 
+	int BitMapMemorySize = BytesPrePixel * (width * height);
+	//Using MEM_COMMIT and MEM_RESERVE to commit the page to memory for later reading/writing
+	//which is what page_readwrite is for
+	BitMapMemory = VirtualAlloc(0, BitMapMemorySize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 	
 }
 
@@ -147,4 +138,5 @@ void Win32UpdateWindow(HDC DeviceContext, int x, int y, int width, int height)
 		DIB_RGB_COLORS, SRCCOPY
 	);
 }
+
 
