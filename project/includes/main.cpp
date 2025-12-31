@@ -27,6 +27,8 @@ internal
 void Renderfun(int x, int y);
 internal
 void PixelPlot(int x, int y, uint32_t color);
+internal
+void ParamertieLine(int x1, int y1, int x2, int y2, uint32_t color);
 
 int WINAPI WinMain(
 	_In_ HINSTANCE hInstance, 
@@ -138,7 +140,8 @@ void Win32ResizeDIBSection(int width, int height)
 	BitMapMemory = VirtualAlloc(0, BitMapMemorySize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 	
 	//Renderfun(128, 0);
-	PixelPlot(width/2, height/2, 0xffff00);
+	//PixelPlot(width/2, height/2, 0xffff00);
+	ParamertieLine(0, 0, width / 2, height / 2, 0x0000ff);
 }
 
 void Win32UpdateWindow(HDC DeviceContext, RECT* ClientRECT)
@@ -208,4 +211,25 @@ void PixelPlot(int x, int y, uint32_t color)
 	uint32_t* Pixel = (uint32_t*)(Row + x * 4);
 
 	*Pixel = color;
+}
+
+void ParamertieLine(int x1, int y1, int x2, int y2, uint32_t color)
+{
+	//What difference is greater?
+	uint32_t deltaX = (x2 - x1);
+
+
+	uint32_t deltaY = (y2 - y1);
+
+
+	uint32_t rateOfChange = deltaY > deltaX ? deltaY : deltaX;
+
+	for(int i = 0; i < rateOfChange; i++)
+	{
+		float r = (float)i / (float)rateOfChange;
+		uint32_t x = x1 + r * deltaX;
+		uint32_t y = y1 + r * deltaY;
+		PixelPlot(x, y, color);
+	}
+
 }
