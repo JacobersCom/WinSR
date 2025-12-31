@@ -25,7 +25,8 @@ internal //Local to this file only
 void Win32UpdateWindow(HDC DeviceContext, RECT* ClientRECT);
 internal
 void Renderfun(int x, int y);
-
+internal
+void PixelPlot(int x, int y, uint32_t color);
 
 int WINAPI WinMain(
 	_In_ HINSTANCE hInstance, 
@@ -73,7 +74,7 @@ int WINAPI WinMain(
 	return 0;
 }
 
-LRESULT WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+LRESULT WindowProc(HWND Window, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
@@ -83,12 +84,12 @@ LRESULT WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}break;
 		case WM_CLOSE :
 		{
-			DestroyWindow(hwnd);
+			DestroyWindow(Window);
 		}break;
 		case WM_SIZE :
 		{
 			RECT ClientRect;
-			GetClientRect(hwnd, &ClientRect);
+			GetClientRect(Window, &ClientRect);
 			int width = ClientRect.right - ClientRect.left;
 			int height = ClientRect.bottom - ClientRect.top;
 			Win32ResizeDIBSection(width, height);
@@ -98,16 +99,16 @@ LRESULT WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			
 			PAINTSTRUCT Paint;
-			HDC DeviceContext = BeginPaint(hwnd, &Paint);
+			HDC DeviceContext = BeginPaint(Window, &Paint);
 			RECT ClientRECT;
-			GetClientRect(hwnd, &ClientRECT);
+			GetClientRect(Window, &ClientRECT);
 			Win32UpdateWindow(DeviceContext, &ClientRECT);
-			EndPaint(hwnd, &Paint);
+			//EndPaint(hwnd, &Paint);
 			break;
 		}
 	}
 
-	return DefWindowProc(hwnd, message, wParam, lParam);
+	return DefWindowProc(Window, message, wParam, lParam);
 }
 
 
@@ -123,7 +124,7 @@ void Win32ResizeDIBSection(int width, int height)
 
 	BitMapInfo.bmiHeader.biSize = sizeof(BitMapInfo.bmiHeader);
 	BitMapInfo.bmiHeader.biWidth = BitMapWidth;
-	BitMapInfo.bmiHeader.biHeight = -BitMapHeight;
+	BitMapInfo.bmiHeader.biHeight = BitMapHeight;
 	BitMapInfo.bmiHeader.biPlanes = 1;
 	BitMapInfo.bmiHeader.biBitCount = 32; //bit count prepixel
 	BitMapInfo.bmiHeader.biCompression = BI_RGB;
@@ -136,8 +137,8 @@ void Win32ResizeDIBSection(int width, int height)
 	//which is what page_readwrite is for
 	BitMapMemory = VirtualAlloc(0, BitMapMemorySize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 	
-	Renderfun(128, 0);
-	
+	//Renderfun(128, 0);
+	PixelPlot(width/2, height/2, 0xffff00);
 }
 
 void Win32UpdateWindow(HDC DeviceContext, RECT* ClientRECT)
@@ -171,17 +172,17 @@ void Renderfun(int _x, int _y)
 		{
 			//Move to next pixel
 
-			//Red byte 0 
+			//Blue byte 0 
 			*Pixel = (uint8_t)(x + _x);
 			//Move one byte
+			Pixel++;
+
+			//Green byte 1
+			*Pixel = (uint8_t)(x+_x);
 			++Pixel;
 
-			//Blue byte 1
-			*Pixel = (uint8_t)(y +_y);
-			++Pixel;
-
-			//Green Byte 2
-			*Pixel = (uint8_t)Row;
+			//Red Byte 2
+			*Pixel = (uint8_t)(x+_x);
 			++Pixel;
 
 			//Alpha Byte 3
@@ -193,4 +194,20 @@ void Renderfun(int _x, int _y)
 	}
 }
 
+void PixelPlot(int x, int y, uint32_t colorARGB)
+{
+	// 1) Bounds check so you don't scribble into random memory
+	if (x < 0 || x >= BitMapWidth || y < 0 || y >= BitMapHeight) return;
 
+	// 2) Compute the address of the start of row y in BYTES
+	uint8_t* base = (uint8_t*)BitMapMemory;
+	int      pitch = BitMapWidth * 4;
+	uint8_t* row = base + y * pitch;
+
+	// 3) Move to pixel x in BYTES (x * 4 for 32bpp)
+	uint32_t* pixel = (uint32_t*)(row + x * 4);
+
+	// 4) Write the whole pixel in one shot.
+	// If you pass 0xAARRGGBB, little-endian memory becomes BB GG RR AA (BGRA), which is what Windows expects.
+	*pixel = colorARGB;
+}
