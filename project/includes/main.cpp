@@ -6,10 +6,13 @@
 #define local_persist static
 #define internal static
 
+//Remove all global vars
 global_var bool running;
 global_var BITMAPINFO BitMapInfo;
 //Using a void* to repersent new allocated memory
 global_var void* BitMapMemory;
+global_var int BitMapWidth;
+global_var int BitMapHeight;
 
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -17,7 +20,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
 internal //Local to this file only
 void Win32ResizeDIBSection(int width, int height);
 internal //Local to this file only
-void Win32UpdateWindow(HDC DeviceContext, int x, int y, int width, int height);
+void Win32UpdateWindow(HDC DeviceContext, RECT* ClientRECT);
 internal
 void ErrorExit();
 
@@ -91,15 +94,12 @@ LRESULT WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 		case WM_PAINT :
 		{
+			
 			PAINTSTRUCT Paint;
 			HDC DeviceContext = BeginPaint(hwnd, &Paint);
-			int x = Paint.rcPaint.left;
-			int y = Paint.rcPaint.top;
-			int width = Paint.rcPaint.right - Paint.rcPaint.left;
-			int height = Paint.rcPaint.bottom - Paint.rcPaint.top;
-			local_persist DWORD Operation = WHITENESS;
-			PatBlt(DeviceContext, x, y, width, height, Operation);
-			Win32UpdateWindow(DeviceContext, x, y, width, height);
+			RECT ClientRECT;
+			GetClientRect(hwnd, &ClientRECT);
+			Win32UpdateWindow(DeviceContext, &ClientRECT);
 			EndPaint(hwnd, &Paint);
 			break;
 		}
@@ -116,23 +116,36 @@ void Win32ResizeDIBSection(int width, int height)
 		VirtualFree(BitMapMemory, 0, MEM_RELEASE);
 	}
 
+	BitMapWidth = width;
+	BitMapHeight = height;
+
+	BitMapInfo.bmiHeader.biSize = sizeof(BitMapInfo.bmiHeader);
+	BitMapInfo.bmiHeader.biWidth = BitMapWidth;
+	BitMapInfo.bmiHeader.biHeight = BitMapHeight;
+	BitMapInfo.bmiHeader.biPlanes = 1;
+	BitMapInfo.bmiHeader.biBitCount = 32; //bit count prepixel
+	BitMapInfo.bmiHeader.biCompression = BI_RGB;
+
 	//Amount of bytes prepixel
 	int BytesPrePixel = 4;
 	//total pixels of rect 
-	int BitMapMemorySize = BytesPrePixel * (width * height);
+	int BitMapMemorySize = BytesPrePixel * (BitMapWidth * BitMapHeight);
 	//Using MEM_COMMIT and MEM_RESERVE to commit the page to memory for later reading/writing
 	//which is what page_readwrite is for
 	BitMapMemory = VirtualAlloc(0, BitMapMemorySize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 	
 }
 
-void Win32UpdateWindow(HDC DeviceContext, int x, int y, int width, int height)
+void Win32UpdateWindow(HDC DeviceContext, RECT* ClientRECT)
 {
 	//Rect to rect image copy, if the des is bigger the image is increased
+	int WindowWidth = ClientRECT->right - ClientRECT->left;
+	int WindowHeight = ClientRECT->bottom - ClientRECT->top;
+
 	StretchDIBits(
 		DeviceContext,
-		x, y, width, height,
-		x, y, width, height,
+		0, 0, WindowWidth, WindowHeight,
+		0, 0, BitMapWidth, BitMapHeight,
 		BitMapMemory, 
 		&BitMapInfo,
 		DIB_RGB_COLORS, SRCCOPY
