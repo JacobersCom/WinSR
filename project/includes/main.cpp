@@ -1,6 +1,7 @@
 #include <Windows.h>
 #include <stdio.h >
 #include <stdint.h>
+#include <cuda_runtime.h>
 
 
 #define global_var static
@@ -31,6 +32,7 @@ internal
 void ParamertieLine(int x1, int y1, int x2, int y2, uint32_t color);
 internal
 uint32_t Lerp(int start, float ratio, int deltaStart) { return start + ratio * deltaStart; }
+__global__ void vecAdd(float* a, float* b, float* c);
 
 int WINAPI WinMain(
 	_In_ HINSTANCE hInstance, 
@@ -74,6 +76,8 @@ int WINAPI WinMain(
 		TranslateMessage(&msg); //Always called before dispatch
 		DispatchMessage(&msg); //Alows the system to ignore or reply to the message
 	}
+
+	vecAdd<<<1, 256 >>>(a, b, c);
 
 	return 0;
 }
@@ -231,4 +235,9 @@ void ParamertieLine(int x1, int y1, int x2, int y2, uint32_t color)
 		uint32_t y = Lerp(x1, r, deltaY);
 		PlotPixel(x, y, color);
 	}
+}
+
+__global__ void vecAdd(float* a, float* b, float* c)
+{
+	return __global__ void();
 }
