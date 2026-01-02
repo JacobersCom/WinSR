@@ -1,7 +1,7 @@
 #include <Windows.h>
 #include <stdio.h >
 #include <stdint.h>
-#include <cuda_runtime.h>
+#include <iostream>
 
 
 #define global_var static
@@ -32,7 +32,28 @@ internal
 void ParamertieLine(int x1, int y1, int x2, int y2, uint32_t color);
 internal
 uint32_t Lerp(int start, float ratio, int deltaStart) { return start + ratio * deltaStart; }
-__global__ void vecAdd(float* a, float* b, float* c);
+
+#if _DEBUG
+internal
+void CreateConsoleWindow()
+{
+	if (!AttachConsole(ATTACH_PARENT_PROCESS))
+	{
+		//Creates a console window
+		AllocConsole();
+	}
+
+	FILE* stream;
+
+	freopen_s(&stream, "CONOUT$", "w", stdout);
+	freopen_s(&stream, "CONOUT$", "w", stderr);
+	freopen_s(&stream, "CONIN$", "r", stdin);
+
+	std::ios::sync_with_stdio(true);
+
+	std::cout << "Debug Window ready.\n";
+};
+#endif
 
 int WINAPI WinMain(
 	_In_ HINSTANCE hInstance, 
@@ -69,6 +90,13 @@ int WINAPI WinMain(
 
 	ShowWindow(hwnd, show);
 
+#if _DEBUG
+CreateConsoleWindow();
+#endif // DEBUG
+
+
+	std::cout << "Window created: " << hwnd << "\n";
+
 	MSG msg = {};
 
 	while (GetMessage(&msg, NULL, 0, 0) > 0)
@@ -77,7 +105,6 @@ int WINAPI WinMain(
 		DispatchMessage(&msg); //Alows the system to ignore or reply to the message
 	}
 
-	vecAdd<<<1, 256 >>>(a, b, c);
 
 	return 0;
 }
@@ -235,9 +262,4 @@ void ParamertieLine(int x1, int y1, int x2, int y2, uint32_t color)
 		uint32_t y = Lerp(x1, r, deltaY);
 		PlotPixel(x, y, color);
 	}
-}
-
-__global__ void vecAdd(float* a, float* b, float* c)
-{
-	return __global__ void();
 }
