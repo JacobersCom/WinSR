@@ -4,6 +4,9 @@
 #include <iostream>
 
 
+#define wW 1024
+#define wH 700
+
 #define global_var static
 #define local_persist static
 #define internal static
@@ -76,7 +79,7 @@ int WINAPI WinMain(
 		className, //window class name
 		L"Raster Surface", //Window title
 		WS_OVERLAPPEDWINDOW, // Window style
-		CW_USEDEFAULT, CW_USEDEFAULT, 1024, 700, //Size and position
+		CW_USEDEFAULT, CW_USEDEFAULT, wW, wH, //Size and position
 		NULL, //Parent window
 		NULL, //Meun
 		hInstance, //Instance handler
