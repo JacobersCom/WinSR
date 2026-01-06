@@ -31,10 +31,6 @@ void Win32UpdateWindow(HDC DeviceContext, RECT* ClientRECT);
 internal
 void Renderfun(int x, int y);
 
-void ParamertieLine(int x1, int y1, int x2, int y2, uint32_t color);
-internal
-uint32_t Lerp(int start, float ratio, int deltaStart) { return start + ratio * deltaStart; }
-
 #if _DEBUG
 internal
 void CreateConsoleWindow()
@@ -173,9 +169,8 @@ void Win32ResizeDIBSection(int width, int height)
 	//which is what page_readwrite is for
 	BitMapMemory = VirtualAlloc(0, BitMapMemorySize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 	
-	//Renderfun(128, 0);
-	//PixelPlot(width/2, height/2, 0xffff00);
-	ParamertieLine(0, 0, width / 2, height / 2, 0x0000ff);
+	ParamertieLine(0, 0, width / 2, height / 2, 0x0000ff, 
+		BitMapMemory, BytePrePixel, BitMapWidth);
 }
 
 void Win32UpdateWindow(HDC DeviceContext, RECT* ClientRECT)
@@ -231,20 +226,4 @@ void Renderfun(int _x, int _y)
 	}
 }
 
-void ParamertieLine(int x1, int y1, int x2, int y2, uint32_t color)
-{
-	//What difference is greater?
-	uint32_t deltaX = (x2 - x1);
-	uint32_t deltaY = (y2 - y1);
-	uint32_t rateOfChange = deltaY > deltaX ? deltaY : deltaX;
 
-	for(uint32_t i = 0; i < rateOfChange; i++)
-	{
-		//ratio
-		float r = (float)i / (float)rateOfChange;
-		//lerp
-		uint32_t x = Lerp(x1, r, deltaX);
-		uint32_t y = Lerp(x1, r, deltaY);
-		PlotPixel(x, y, color, BitMapMemory, BytePrePixel, BitMapWidth);
-	}
-}

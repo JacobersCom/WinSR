@@ -133,9 +133,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="project\includes\main.cpp" />
+    <ClCompile Include="project\includes\Math.cpp" />
     <ClCompile Include="project\includes\Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="project\includes\Math.hpp" />
     <ClInclude Include="project\includes\Renderer.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
