@@ -1,7 +1,8 @@
 #include <Windows.h>
 #include <stdio.h >
-#include <stdint.h>
 #include <iostream>
+
+#include "Renderer.hpp"
 
 
 #define wW 1024
@@ -29,9 +30,7 @@ internal //Local to this file only
 void Win32UpdateWindow(HDC DeviceContext, RECT* ClientRECT);
 internal
 void Renderfun(int x, int y);
-internal
-void PlotPixel(int x, int y, uint32_t color);
-internal
+
 void ParamertieLine(int x1, int y1, int x2, int y2, uint32_t color);
 internal
 uint32_t Lerp(int start, float ratio, int deltaStart) { return start + ratio * deltaStart; }
@@ -107,7 +106,6 @@ CreateConsoleWindow();
 		TranslateMessage(&msg); //Always called before dispatch
 		DispatchMessage(&msg); //Alows the system to ignore or reply to the message
 	}
-
 
 	return 0;
 }
@@ -233,22 +231,6 @@ void Renderfun(int _x, int _y)
 	}
 }
 
-void PlotPixel(int x, int y, uint32_t color)
-{
-	//Where the bitmap is in memory
-	uint8_t* Page = (uint8_t*)BitMapMemory;
-	//Lenght per stride/row
-	uint32_t pitch = BytePrePixel * BitMapWidth;
-
-	//The Y position 
-	uint8_t* Row = Page + y * pitch;
-
-	//The X position. 
-	uint32_t* Pixel = (uint32_t*)(Row + x * 4);
-
-	*Pixel = color;
-}
-
 void ParamertieLine(int x1, int y1, int x2, int y2, uint32_t color)
 {
 	//What difference is greater?
@@ -263,6 +245,6 @@ void ParamertieLine(int x1, int y1, int x2, int y2, uint32_t color)
 		//lerp
 		uint32_t x = Lerp(x1, r, deltaX);
 		uint32_t y = Lerp(x1, r, deltaY);
-		PlotPixel(x, y, color);
+		PlotPixel(x, y, color, BitMapMemory, BytePrePixel, BitMapWidth);
 	}
 }
