@@ -1,5 +1,4 @@
 #include "Renderer.hpp"
-#include "Math.hpp"
 
 void PlotPixel(int x, int y, uint32_t color,
 	void* BitMapMemory, int BytePrePixel, int BitMapWidth)

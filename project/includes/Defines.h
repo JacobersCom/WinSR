@@ -1,10 +1,5 @@
 #pragma once
-#include "RasterSurface.h"
-#include "XTime.h"
-#include "greendragon.h"
 #include <random>
-#include "StoneHenge.h"
-#include "StoneHenge_Texture.h"
 #include <algorithm>
 #include <stdio.h>
 
@@ -27,18 +22,7 @@ float farZ = 10.0;
 float FOV = 90.0f;
 float aspect = (float)SCREEN_W / (float)SCREEN_H;
 
-XTime times;
 using Pixel = unsigned int;
-
-
-enum KeyCodes
-{
-	W = 0x57,
-	A = 0x41,
-	S = 0x53,
-	D = 0x44,
-
-};
 
 
 
