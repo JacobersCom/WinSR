@@ -142,11 +142,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="KWindow.cpp" />
     <ClCompile Include="project\includes\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MReturn.h" />
-    <ClInclude Include="MWindow.h" />
+    <ClInclude Include="KReturn.h" />
+    <ClInclude Include="KWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

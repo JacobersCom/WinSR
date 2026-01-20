@@ -18,5 +18,16 @@
     <ClCompile Include="project\includes\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="KWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="KReturn.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
