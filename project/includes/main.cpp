@@ -1,8 +1,7 @@
 #include <Windows.h>
 #include <stdio.h >
 #include <iostream>
-
-#include "Renderer.hpp"
+#include <vulkan/vulkan.h>
 
 
 #define wW 1024
@@ -168,9 +167,7 @@ void Win32ResizeDIBSection(int width, int height)
 	//Using MEM_COMMIT and MEM_RESERVE to commit the page to memory for later reading/writing
 	//which is what page_readwrite is for
 	BitMapMemory = VirtualAlloc(0, BitMapMemorySize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-	
-	ParamertieLine(0, 0, width / 2, height / 2, 0x0000ff, 
-		BitMapMemory, BytePrePixel, BitMapWidth);
+	Renderfun(120, 0);
 }
 
 void Win32UpdateWindow(HDC DeviceContext, RECT* ClientRECT)

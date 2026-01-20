@@ -18,19 +18,5 @@
     <ClCompile Include="project\includes\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="project\includes\Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="project\includes\Math.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="project\includes\Renderer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="project\includes\Math.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
