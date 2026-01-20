@@ -1,5 +1,7 @@
+#include "MReturn.h"
 
-namespace GM 
+
+namespace MW 
 {
 
 	namespace WINDOW
@@ -7,7 +9,7 @@ namespace GM
 		
 		class MWindow
 		{
-
+			
 		};
 	}
 }
