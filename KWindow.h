@@ -6,9 +6,10 @@ namespace KE::SYSTEM
 
 	struct WindowDesc
 	{
-		const wchar_t ClassName;
-		const int WindowWidth;
-		const int WindowHeight;
+		const WCHAR* ClassName = L"KOS Window";
+		const WCHAR* WindowTitle = L"KOS Engine";
+		const int WindowWidth = 500;
+		const int WindowHeight = 500;
 
 	};
 	
@@ -19,14 +20,12 @@ namespace KE::SYSTEM
 	{
 	public:
 
-		KReturn Create();
+		KReturn Create(WindowDesc& Desc);
 		KReturn SetWindowTitle(const wchar_t Title);
 
 	private:
 
 		KReturn CreateWin32Window(WindowDesc& desc);
-
-		static LRESULT WindowProc(HWND Window, UINT message, WPARAM wParam, LPARAM lParam);
 
 	private:
 

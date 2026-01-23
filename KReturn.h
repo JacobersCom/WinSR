@@ -14,10 +14,12 @@ namespace KE
 
 }
 
-enum class KReturn 
+enum class KReturn
 {
-	M_SUCCESS = 0,
-	M_FAILURE = 1,
+	K_WINDOW_CREATION_FAILED = -1,
+
+	K_SUCCESS = 0,
+	K_FAILURE = 1,
 };
 
 #endif // MRETURN_H
