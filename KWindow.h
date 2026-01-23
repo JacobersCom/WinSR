@@ -1,3 +1,6 @@
+#include <Windows.h>
+
+
 #include "KReturn.h"
 
 //Namespace holds data for making the window
@@ -6,10 +9,10 @@ namespace KE::SYSTEM
 
 	struct WindowDesc
 	{
-		const WCHAR* ClassName = L"KOS Window";
-		const WCHAR* WindowTitle = L"KOS Engine";
-		const int WindowWidth = 500;
-		const int WindowHeight = 500;
+		const WCHAR* ClassName;
+		const WCHAR* WindowTitle;
+		int WindowWidth;
+		int WindowHeight;
 
 	};
 	
@@ -20,20 +23,26 @@ namespace KE::SYSTEM
 	{
 	public:
 
-		KReturn Create(WindowDesc& Desc);
-		KReturn SetWindowTitle(const wchar_t Title);
+		void Create();
+		KReturn SetWindowDesc(const WCHAR* WindowClassName, const WCHAR* WindowTitle,
+			const int WindowWidth, const int WindowHeight);
+		KReturn MessageDispatcher();
 
 	private:
 
-		KReturn CreateWin32Window(WindowDesc& desc);
+		void CreateWin32Window(WindowDesc& desc);
 
 	private:
 
 		//ptr to where the DLL is held
-		HINSTANCE PtrLoader = nullptr;
+		HINSTANCE PtrLoader;
 
 		//Handle to the window
-		HWND WindowHandle = nullptr;
+		HWND WindowHandle;
+
+		WindowDesc _WindowDesc;
 	};
 
 };
+
+LRESULT CALLBACK WindowProc(HWND Window, UINT message, WPARAM wParam, LPARAM lParam);
