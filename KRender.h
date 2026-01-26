@@ -1,4 +1,4 @@
-#include "KReturn.h"
+#include "vkHelper.h"
 
 
 namespace KE::SYSTEM
@@ -14,5 +14,10 @@ namespace KE::SYSTEM
 		KE::KReturn InitVulkan();
 		void UpdateLoop();
 		void CleanUp();
+
+
+	private:
+
+		VkInstance _VkInstance;
 	};
 }
