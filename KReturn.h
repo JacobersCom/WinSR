@@ -11,18 +11,18 @@ MReturns is the beginning of the logging system for the MAUS engine. HELD within
 
 namespace KE
 {
+	enum class KReturn
+	{
+		K_PROGRAM_CLOSED = -3,
+
+		K_WINDOW_CREATION_FAILED = -2,
+		K_WINDOW_CREATION_SUCCESS = 2,
+
+		K_SUCCESS = 0,
+		K_FAILURE = 1,
+	};
 
 }
 
-enum class KReturn
-{
-	K_PROGRAM_CLOSED = -3,
-
-	K_WINDOW_CREATION_FAILED = -2,
-	K_WINDOW_CREATION_SUCCESS = 2,
-
-	K_SUCCESS = 0,
-	K_FAILURE = 1,
-};
 
 #endif // MRETURN_H

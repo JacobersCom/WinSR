@@ -11,7 +11,7 @@ namespace KE::SYSTEM
 
 	private:
 
-		KReturn InitVulkan();
+		KE::KReturn InitVulkan();
 		void UpdateLoop();
 		void CleanUp();
 	};
