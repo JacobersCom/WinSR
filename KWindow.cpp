@@ -10,7 +10,7 @@ namespace KE::SYSTEM
 		CreateWin32Window(_WindowDesc);
 	}
 
-	KReturn KWindow::SetWindowDesc(const WCHAR* WindowClassName, const WCHAR* WindowTitle, 
+	void KWindow::SetWindowDesc(const WCHAR* WindowClassName, const WCHAR* WindowTitle, 
 		const int WindowWidth, const int WindowHeight)
 	{
 		KE::SYSTEM::WindowDesc desc = {};
@@ -22,10 +22,10 @@ namespace KE::SYSTEM
 		
 		_WindowDesc = desc;
 
-		return KReturn::K_WINDOW_CREATION_SUCCESS;
+	
 	}
 	
-	void KWindow::CreateWin32Window(WindowDesc& Desc)
+	KReturn KWindow::CreateWin32Window(WindowDesc& Desc)
 	{
 		PtrLoader = GetModuleHandle(NULL);
 		WNDCLASS wc = {};
@@ -41,6 +41,8 @@ namespace KE::SYSTEM
 		if (WindowHandle == nullptr) return;
 
 		ShowWindow(WindowHandle, SW_SHOW);
+
+		return KReturn::K_WINDOW_CREATION_SUCCESS;
 	}
 
 	KReturn KWindow::MessageDispatcher()

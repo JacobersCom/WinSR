@@ -73,10 +73,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.1\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\VulkanSDK\1.4.335.0\Lib;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>C:\VulkanSDK\1.4.328.1\Include;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v13.1\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\VulkanSDK\1.4.328.1\Lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>C:\VulkanSDK\1.4.335.0\Lib;C:\VulkanSDK\1.4.328.1\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\VulkanSDK\1.4.328.1\Include;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>

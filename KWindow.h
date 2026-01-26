@@ -24,13 +24,13 @@ namespace KE::SYSTEM
 	public:
 
 		void Create();
-		KReturn SetWindowDesc(const WCHAR* WindowClassName, const WCHAR* WindowTitle,
+		void SetWindowDesc(const WCHAR* WindowClassName, const WCHAR* WindowTitle,
 			const int WindowWidth, const int WindowHeight);
 		KReturn MessageDispatcher();
 
 	private:
 
-		void CreateWin32Window(WindowDesc& desc);
+		KReturn CreateWin32Window(WindowDesc& desc);
 
 	private:
 
