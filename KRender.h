@@ -1,0 +1,18 @@
+#include "KReturn.h"
+
+
+namespace KE::SYSTEM
+{
+	class KRender
+	{
+	public:
+
+		void run();
+
+	private:
+
+		KReturn InitVulkan();
+		void UpdateLoop();
+		void CleanUp();
+	};
+}
