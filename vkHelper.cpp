@@ -1,6 +1,6 @@
 #include "vkHelper.h"
 
-KE::KReturn CreateVkInstance(VkInstance _VkInstance)
+KE::KReturn CreateVkInstance(VkInstance* _VkInstance)
 {
 	//Applcation information
 	VkApplicationInfo AppInfo{};

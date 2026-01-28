@@ -26,6 +26,9 @@ namespace KE::SYSTEM
 			const int WindowWidth, const int WindowHeight);
 		KReturn EventDispatcher();
 
+		const HWND GetWindowHandle() { return WindowHandle; }
+		const HINSTANCE GetWindowInstance() { return PtrLoader; }
+
 	private:
 
 		KReturn CreateWin32Window(WindowDesc& desc);
@@ -33,10 +36,10 @@ namespace KE::SYSTEM
 	private:
 
 		//ptr to where the DLL is held
-		HINSTANCE PtrLoader;
+		const HINSTANCE PtrLoader;
 
 		//Handle to the window
-		HWND WindowHandle;
+		const HWND WindowHandle;
 
 		WindowDesc _WindowDesc;
 	};

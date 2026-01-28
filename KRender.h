@@ -11,6 +11,8 @@ namespace KE::SYSTEM
 
 		void run();
 
+		const VkInstance GetVkInstance() { return _VkInstance; }
+
 	private:
 
 		KE::KReturn InitVulkan();

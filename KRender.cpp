@@ -13,7 +13,7 @@ namespace KE::SYSTEM
 	KReturn KRender::InitVulkan() 
 	{
 
-		CreateVkInstance(_VkInstance);
+		CreateVkInstance(&_VkInstance);
 		return KE::KReturn::K_SUCCESS;
 	}
 
