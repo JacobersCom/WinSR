@@ -16,8 +16,6 @@ namespace KE::SYSTEM
 
 	};
 	
-
-
 	//Class holds functions and private memebers for class
 	class KWindow
 	{
@@ -26,7 +24,7 @@ namespace KE::SYSTEM
 		void Create();
 		void SetWindowDesc(const WCHAR* WindowClassName, const WCHAR* WindowTitle,
 			const int WindowWidth, const int WindowHeight);
-		KReturn MessageDispatcher();
+		KReturn EventDispatcher();
 
 	private:
 

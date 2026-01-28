@@ -6,5 +6,5 @@ int main()
 
 	_win.SetWindowDesc(L"KOS", L"KOS Engine", 500, 500);
 	_win.Create();
-	_win.MessageDispatcher();
+	_win.EventDispatcher();
 }

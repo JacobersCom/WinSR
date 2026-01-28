@@ -45,7 +45,7 @@ namespace KE::SYSTEM
 		return KReturn::K_WINDOW_CREATION_SUCCESS;
 	}
 
-	KReturn KWindow::MessageDispatcher()
+	KReturn KWindow::EventDispatcher()
 	{
 		MSG msg = {};
 

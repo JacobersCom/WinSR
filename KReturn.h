@@ -14,6 +14,9 @@ namespace KE
 	enum class KReturn
 	{
 		K_PROGRAM_CLOSED = -3,
+enum class KReturn
+{
+	K_PROGRAM_CLOSED = -3,
 
 		K_WINDOW_CREATION_FAILED = -2,
 		K_WINDOW_CREATION_SUCCESS = 2,
