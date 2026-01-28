@@ -38,7 +38,7 @@ namespace KE::SYSTEM
 		WindowHandle = CreateWindowEx(0, Desc.ClassName, Desc.WindowTitle, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT
 			, CW_USEDEFAULT, Desc.WindowWidth, Desc.WindowHeight, NULL, NULL, PtrLoader, NULL);
 
-		if (WindowHandle == nullptr) return;
+		if (WindowHandle == nullptr) return KReturn::K_WINDOW_CREATION_FAILED;
 
 		ShowWindow(WindowHandle, SW_SHOW);
 
