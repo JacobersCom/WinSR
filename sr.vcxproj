@@ -146,6 +146,7 @@
     <ClCompile Include="KRender.cpp" />
     <ClCompile Include="KWindow.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="vkHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="KRender.h" />

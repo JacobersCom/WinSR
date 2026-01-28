@@ -3,6 +3,7 @@ MReturns is the beginning of the logging system for the MAUS engine. HELD within
 - Goal
 	- Have return codes for different vulkan and windows API error that are ambiguous 
 */
+#pragma once
 
 #ifndef KRETURN_H
 #define KRETURN_H

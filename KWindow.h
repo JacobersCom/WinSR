@@ -1,6 +1,6 @@
+#pragma once
+
 #include <Windows.h>
-
-
 #include "KReturn.h"
 
 //Namespace holds data for making the window
