@@ -36,10 +36,10 @@ namespace KE::SYSTEM
 	private:
 
 		//ptr to where the DLL is held
-		const HINSTANCE PtrLoader;
+		HINSTANCE PtrLoader;
 
 		//Handle to the window
-		const HWND WindowHandle;
+		HWND WindowHandle;
 
 		WindowDesc _WindowDesc;
 	};

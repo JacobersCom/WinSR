@@ -1,6 +1,6 @@
 #include "vkHelper.h"
 
-KE::KReturn CreateVkInstance(VkInstance* _VkInstance)
+KE::KReturn CreateVkInstance(VkInstance& _VkInstance)
 {
 	//Applcation information
 	VkApplicationInfo AppInfo{};
@@ -25,4 +25,23 @@ KE::KReturn CreateVkInstance(VkInstance* _VkInstance)
 
 	return KE::KReturn::K_SUCCESS;
 
+}
+
+KE::KReturn CreateWin32Surface(HWND _windowHandle, HINSTANCE _windowInstance, VkInstance _VkInstance)
+{
+	VkWin32SurfaceCreateInfoKHR _WinSurfaceInfo{};
+
+	_WinSurfaceInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+	_WinSurfaceInfo.hwnd = _windowHandle;
+	_WinSurfaceInfo.hinstance = _windowInstance;
+
+	VkSurfaceKHR surface;
+
+	VkResult result = vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &surface);
+	if (result != VK_SUCCESS)
+	{
+		std::cerr << "Failed to create WindowSurface";
+	}
+
+	return KE::KReturn::K_SUCCESS;
 }
