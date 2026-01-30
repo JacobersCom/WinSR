@@ -12,13 +12,24 @@ KE::KReturn CreateVkInstance(VkInstance& _VkInstance)
 	AppInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
 	AppInfo.pEngineName = "KOS";
 	AppInfo.apiVersion = VK_API_VERSION_1_4;
-
-	//Structure for newly created instance
+	
 	VkInstanceCreateInfo InstanceInfo{};
 
 	InstanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	InstanceInfo.pApplicationInfo = &AppInfo;
 	InstanceInfo.pNext = VK_NULL_HANDLE;
+
+	if (enableValidationLayers && !CheckValidationLayerSupport())
+	{
+		throw std::runtime_error("Validation layers requested, but not available");
+	}
+	else
+	{
+		InstanceInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+		InstanceInfo.ppEnabledLayerNames = validationLayers.data();
+	}
+
+	//Structure for newly created instance
 
 
 	vkCreateInstance(&InstanceInfo, nullptr, &_VkInstance);

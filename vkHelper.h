@@ -8,7 +8,7 @@
 #include "KReturn.h"
 #include "vulkan/vulkan.h"
 
-std::vector<const char*> validationLayers = {
+static std::vector<const char*> validationLayers = {
 
 	"VK_LAYER_KHRONOS_validation"
 };
