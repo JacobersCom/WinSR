@@ -1,5 +1,6 @@
 #pragma once
-  
+#pragma once
+
 #define VK_USE_PLATFORM_WIN32_KHR
 
 #include <iostream>
@@ -25,6 +26,9 @@ KE::KReturn CreateVkInstance(VkInstance& _VkInstance);
 //Creates a Vulkan Surface for win32
 KE::KReturn CreateWin32Surface(HWND _windowHandle, HINSTANCE _windowInstance, VkInstance _VkInstance);
 
-static bool CheckValidationLayerSupport();
+KE::KReturn PickPhyicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance);
 
+//May need more error checking
+static bool CheckValidationLayerSupport();
 static std::vector<const char*> GetRequiredExtentions();
+static bool IsDeviceSuitable();

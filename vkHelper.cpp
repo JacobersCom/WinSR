@@ -51,9 +51,41 @@ KE::KReturn CreateWin32Surface(HWND _windowHandle, HINSTANCE _windowInstance, Vk
 	VkSurfaceKHR surface;
 
 	VkResult result = vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &surface);
+	
 	if (result != VK_SUCCESS)
 	{
-		std::cerr << "Failed to create WindowSurface";
+		throw std::runtime_error("Win32 Surface creation failed");
+	}
+
+	return KE::KReturn::K_SUCCESS;
+}
+
+KE::KReturn PickPhyicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance)
+{
+	uint32_t deviceCount = 0;
+
+	vkEnumeratePhysicalDevices(_VkInstance, &deviceCount, nullptr);
+
+	if (deviceCount == 0)
+	{
+		throw std::runtime_error("No device with vulkan support found!");
+	}
+
+	std::vector<VkPhysicalDevice> devices(deviceCount);
+	vkEnumeratePhysicalDevices(_VkInstance, &deviceCount, devices.data());
+
+	for (const auto& device : devices)
+	{
+		if (IsDeviceSuitable(device))
+		{
+			_VkPhysicalDevice = device;
+			break;
+		}
+	}
+
+	if (_VkPhysicalDevice == VK_NULL_HANDLE)
+	{
+		throw std::runtime_error("Failed to find Suitable GPU");
 	}
 
 	return KE::KReturn::K_SUCCESS;
@@ -104,4 +136,9 @@ std::vector<const char*> GetRequiredExtentions()
 
 
 	return extentions;
+}
+
+bool IsDeviceSuitable(VkPhysicalDevice _VkPhysicalDevice)
+{
+	return true;
 }

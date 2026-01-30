@@ -23,5 +23,6 @@ namespace KE::SYSTEM
 	private:
 
 		VkInstance _VkInstance;
+		VkPhysicalDevice _VkPhyscialDevice;
 	};
 }
