@@ -25,4 +25,6 @@ KE::KReturn CreateVkInstance(VkInstance& _VkInstance);
 //Creates a Vulkan Surface for win32
 KE::KReturn CreateWin32Surface(HWND _windowHandle, HINSTANCE _windowInstance, VkInstance _VkInstance);
 
-bool CheckValidationLayerSupport();
+static bool CheckValidationLayerSupport();
+
+static std::vector<const char*> GetRequiredExtentions();

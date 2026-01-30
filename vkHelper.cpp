@@ -15,9 +15,13 @@ KE::KReturn CreateVkInstance(VkInstance& _VkInstance)
 	
 	VkInstanceCreateInfo InstanceInfo{};
 
+	auto extentions = GetRequiredExtentions();
+
 	InstanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	InstanceInfo.pApplicationInfo = &AppInfo;
 	InstanceInfo.pNext = VK_NULL_HANDLE;
+	InstanceInfo.enabledExtensionCount = extentions.size();
+	InstanceInfo.ppEnabledExtensionNames = extentions.data();
 
 	if (enableValidationLayers && !CheckValidationLayerSupport())
 	{
@@ -28,8 +32,6 @@ KE::KReturn CreateVkInstance(VkInstance& _VkInstance)
 		InstanceInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
 		InstanceInfo.ppEnabledLayerNames = validationLayers.data();
 	}
-
-	//Structure for newly created instance
 
 
 	vkCreateInstance(&InstanceInfo, nullptr, &_VkInstance);
@@ -61,6 +63,7 @@ bool CheckValidationLayerSupport()
 {
 	uint32_t layerCount;
 
+	
 	vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
 
 	std::vector<VkLayerProperties> availableLayers(layerCount);
@@ -85,4 +88,20 @@ bool CheckValidationLayerSupport()
 		}
 	}
 	return true;
+}
+
+std::vector<const char*> GetRequiredExtentions()
+{
+	std::vector<const char*> extentions;
+
+	if (enableValidationLayers)
+	{
+		extentions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+	}
+
+	extentions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+	extentions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+
+
+	return extentions;
 }
