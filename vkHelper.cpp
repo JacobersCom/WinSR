@@ -1,97 +1,100 @@
 #include "vkHelper.h"
-
-KE::KReturn CreateVkInstance(VkInstance& _VkInstance)
+namespace KE::VULKAN
 {
-	//Applcation information
-	VkApplicationInfo AppInfo{};
+	KE::KReturn CreateVkInstance(VkInstance& _VkInstance)
+	{
+		//Applcation information
+		VkApplicationInfo AppInfo{};
 
-	AppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-	AppInfo.pNext = VK_NULL_HANDLE;
-	AppInfo.pApplicationName = "KOS Engine";
-	AppInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-	AppInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-	AppInfo.pEngineName = "KOS";
-	AppInfo.apiVersion = VK_API_VERSION_1_4;
+		AppInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+		AppInfo.pNext = VK_NULL_HANDLE;
+		AppInfo.pApplicationName = "KOS Engine";
+		AppInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+		AppInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+		AppInfo.pEngineName = "KOS";
+		AppInfo.apiVersion = VK_API_VERSION_1_4;
 	
-	VkInstanceCreateInfo InstanceInfo{};
+		VkInstanceCreateInfo InstanceInfo{};
 
-	auto extentions = GetRequiredExtentions();
+		auto extentions = GetRequiredExtentions();
 
-	InstanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-	InstanceInfo.pApplicationInfo = &AppInfo;
-	InstanceInfo.pNext = VK_NULL_HANDLE;
-	InstanceInfo.enabledExtensionCount = extentions.size();
-	InstanceInfo.ppEnabledExtensionNames = extentions.data();
+		InstanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+		InstanceInfo.pApplicationInfo = &AppInfo;
+		InstanceInfo.pNext = VK_NULL_HANDLE;
+		InstanceInfo.enabledExtensionCount = static_cast<uint32_t>(extentions.size());
+		InstanceInfo.ppEnabledExtensionNames = extentions.data();
 
-	if (enableValidationLayers && !CheckValidationLayerSupport())
-	{
-		throw std::runtime_error("Validation layers requested, but not available");
-	}
-	else
-	{
-		InstanceInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-		InstanceInfo.ppEnabledLayerNames = validationLayers.data();
-	}
-
-
-	vkCreateInstance(&InstanceInfo, nullptr, &_VkInstance);
-
-	return KE::KReturn::K_SUCCESS;
-
-}
-
-KE::KReturn CreateWin32Surface(HWND _windowHandle, HINSTANCE _windowInstance, VkInstance _VkInstance)
-{
-	VkWin32SurfaceCreateInfoKHR _WinSurfaceInfo{};
-
-	_WinSurfaceInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-	_WinSurfaceInfo.hwnd = _windowHandle;
-	_WinSurfaceInfo.hinstance = _windowInstance;
-
-	VkSurfaceKHR surface;
-
-	VkResult result = vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &surface);
-	
-	if (result != VK_SUCCESS)
-	{
-		throw std::runtime_error("Win32 Surface creation failed");
-	}
-
-	return KE::KReturn::K_SUCCESS;
-}
-
-KE::KReturn PickPhyicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance)
-{
-	uint32_t deviceCount = 0;
-
-	vkEnumeratePhysicalDevices(_VkInstance, &deviceCount, nullptr);
-
-	if (deviceCount == 0)
-	{
-		throw std::runtime_error("No device with vulkan support found!");
-	}
-
-	std::vector<VkPhysicalDevice> devices(deviceCount);
-	vkEnumeratePhysicalDevices(_VkInstance, &deviceCount, devices.data());
-
-	for (const auto& device : devices)
-	{
-		if (IsDeviceSuitable(device))
+		if (enableValidationLayers && !CheckValidationLayerSupport())
 		{
-			_VkPhysicalDevice = device;
-			break;
+			throw std::runtime_error("Validation layers requested, but not available");
 		}
+		else
+		{
+			InstanceInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+			InstanceInfo.ppEnabledLayerNames = validationLayers.data();
+		}
+
+
+		vkCreateInstance(&InstanceInfo, nullptr, &_VkInstance);
+
+		return KE::KReturn::K_SUCCESS;
+
 	}
 
-	if (_VkPhysicalDevice == VK_NULL_HANDLE)
+	KE::KReturn CreateWin32Surface(HWND _windowHandle, HINSTANCE _windowInstance, VkInstance _VkInstance)
 	{
-		throw std::runtime_error("Failed to find Suitable GPU");
+		VkWin32SurfaceCreateInfoKHR _WinSurfaceInfo{};
+
+		_WinSurfaceInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+		_WinSurfaceInfo.hwnd = _windowHandle;
+		_WinSurfaceInfo.hinstance = _windowInstance;
+
+		VkSurfaceKHR surface;
+
+		VkResult result = vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &surface);
+	
+		if (result != VK_SUCCESS)
+		{
+			throw std::runtime_error("Win32 Surface creation failed");
+		}
+
+		return KE::KReturn::K_SUCCESS;
 	}
 
-	return KE::KReturn::K_SUCCESS;
+	KE::KReturn PickPhyicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance)
+	{
+		uint32_t deviceCount = 0;
+
+		vkEnumeratePhysicalDevices(_VkInstance, &deviceCount, nullptr);
+
+		if (deviceCount == 0)
+		{
+			throw std::runtime_error("No device with vulkan support found!");
+		}
+
+		std::vector<VkPhysicalDevice> devices(deviceCount);
+		vkEnumeratePhysicalDevices(_VkInstance, &deviceCount, devices.data());
+
+		for (const auto device : devices)
+		{
+			if (IsDeviceSuitable(device))
+			{
+				_VkPhysicalDevice = device;
+				break;
+			}
+		}
+
+		if (_VkPhysicalDevice == VK_NULL_HANDLE)
+		{
+			throw std::runtime_error("Failed to find Suitable GPU");
+		}
+
+		return KE::KReturn::K_SUCCESS;
+	}
+
 }
 
-bool CheckValidationLayerSupport()
+static bool CheckValidationLayerSupport()
 {
 	uint32_t layerCount;
 
@@ -122,7 +125,7 @@ bool CheckValidationLayerSupport()
 	return true;
 }
 
-std::vector<const char*> GetRequiredExtentions()
+static std::vector<const char*> GetRequiredExtentions()
 {
 	std::vector<const char*> extentions;
 
@@ -138,7 +141,7 @@ std::vector<const char*> GetRequiredExtentions()
 	return extentions;
 }
 
-bool IsDeviceSuitable(VkPhysicalDevice _VkPhysicalDevice)
+static bool IsDeviceSuitable(VkPhysicalDevice _VkPhysicalDevice)
 {
 	return true;
 }
