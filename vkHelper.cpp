@@ -92,6 +92,39 @@ namespace KE::VULKAN
 		return KE::KReturn::K_SUCCESS;
 	}
 
+	//Logic to find graphics queue family
+	uint32_t FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice)
+	{
+		QueueFamilyIndices indices;
+
+		uint32_t queueFamilyCount = 0;
+		vkGetPhysicalDeviceQueueFamilyProperties(_VkPhysicalDevice, &queueFamilyCount, nullptr);
+
+		std::vector<VkQueueFamilyProperties> queueFamilys(queueFamilyCount);
+
+		vkGetPhysicalDeviceQueueFamilyProperties(_VkPhysicalDevice, &queueFamilyCount, queueFamilys.data());
+
+		int i = 0;
+		for (const auto& queueFamily : queueFamilys)
+		{
+			if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+			{
+				indices.GraphicsFamily = i;
+			}
+
+			if (indices.isComplete()) break;
+			i++;
+		}
+
+		return indices;
+	}
+
+	QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice)
+	{
+		QueueFamilyIndices indices;
+		return indices;
+	}
+
 }
 
 static bool CheckValidationLayerSupport()
@@ -141,7 +174,15 @@ static std::vector<const char*> GetRequiredExtentions()
 	return extentions;
 }
 
+//If the device has the properties and feature needed
 static bool IsDeviceSuitable(VkPhysicalDevice _VkPhysicalDevice)
 {
-	return true;
+	VkPhysicalDeviceProperties _VkDeviceProperties;
+	VkPhysicalDeviceFeatures _VkDeviceFeatures;
+
+	vkGetPhysicalDeviceProperties(_VkPhysicalDevice, &_VkDeviceProperties);
+	vkGetPhysicalDeviceFeatures(_VkPhysicalDevice, &_VkDeviceFeatures);
+
+	return _VkDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
+		_VkDeviceFeatures.geometryShader;
 }

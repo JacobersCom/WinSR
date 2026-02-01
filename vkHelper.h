@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <vector>
+#include <optional>
 
 #include "KReturn.h"
 #include "vulkan/vulkan.h"
@@ -14,6 +15,16 @@
 #else 
 	const bool enableValidationLayers = true;
 #endif
+
+static struct QueueFamilyIndices {
+
+	std::optional<uint32_t>(GraphicsFamily);
+
+	bool isComplete()
+	{
+		return GraphicsFamily.has_value();
+	}
+};
 
 static std::vector<const char*> validationLayers = {
 
@@ -30,10 +41,16 @@ namespace KE::VULKAN
 	//Creates a Vulkan Surface for win32
 	KE::KReturn CreateWin32Surface(HWND _windowHandle, HINSTANCE _windowInstance, VkInstance _VkInstance);
 
+	//Picks a GPU with Vulkan driver support
 	KE::KReturn PickPhyicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance);
+	
+	KE::KReturn FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
+
+	QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
 }
 
 //May need more error checking
 static bool CheckValidationLayerSupport();
 static std::vector<const char*> GetRequiredExtentions();
 static bool IsDeviceSuitable(VkPhysicalDevice _VkPhysicalDevice);
+
