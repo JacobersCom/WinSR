@@ -19,6 +19,7 @@
 static struct QueueFamilyIndices {
 
 	std::optional<uint32_t>(GraphicsFamily);
+	uint32_t QueueCount = 0;
 
 	bool isComplete()
 	{
@@ -44,9 +45,11 @@ namespace KE::VULKAN
 	//Picks a GPU with Vulkan driver support
 	KE::KReturn PickPhyicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance);
 	
-	KE::KReturn FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
+	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
 
 	QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
+
+	KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice);
 }
 
 //May need more error checking

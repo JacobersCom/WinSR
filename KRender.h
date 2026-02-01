@@ -1,7 +1,7 @@
 #pragma once
 
 #include "vkHelper.h"
-
+#include "KWindow.h" 
 
 namespace KE::SYSTEM
 {
@@ -22,7 +22,9 @@ namespace KE::SYSTEM
 
 	private:
 
+		KE::SYSTEM::KWindow _win;
 		VkInstance _VkInstance;
+		VkDevice _VkDevice;
 		VkPhysicalDevice _VkPhyscialDevice;
 	};
 }

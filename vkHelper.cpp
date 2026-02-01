@@ -1,4 +1,5 @@
 #include "vkHelper.h"
+
 namespace KE::VULKAN
 {
 	KE::KReturn CreateVkInstance(VkInstance& _VkInstance)
@@ -63,8 +64,8 @@ namespace KE::VULKAN
 
 	KE::KReturn PickPhyicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance)
 	{
+		//Get device count
 		uint32_t deviceCount = 0;
-
 		vkEnumeratePhysicalDevices(_VkInstance, &deviceCount, nullptr);
 
 		if (deviceCount == 0)
@@ -72,9 +73,11 @@ namespace KE::VULKAN
 			throw std::runtime_error("No device with vulkan support found!");
 		}
 
+		//Get device information
 		std::vector<VkPhysicalDevice> devices(deviceCount);
 		vkEnumeratePhysicalDevices(_VkInstance, &deviceCount, devices.data());
 
+		//Find a suitable device with vulkan support
 		for (const auto device : devices)
 		{
 			if (IsDeviceSuitable(device))
@@ -93,27 +96,28 @@ namespace KE::VULKAN
 	}
 
 	//Logic to find graphics queue family
-	uint32_t FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice)
+	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice)
 	{
 		QueueFamilyIndices indices;
 
+		//Get the properties count
 		uint32_t queueFamilyCount = 0;
 		vkGetPhysicalDeviceQueueFamilyProperties(_VkPhysicalDevice, &queueFamilyCount, nullptr);
 
+		//Get the properties data
 		std::vector<VkQueueFamilyProperties> queueFamilys(queueFamilyCount);
-
 		vkGetPhysicalDeviceQueueFamilyProperties(_VkPhysicalDevice, &queueFamilyCount, queueFamilys.data());
 
-		int i = 0;
+		//Find the graphics bit queue family
 		for (const auto& queueFamily : queueFamilys)
 		{
 			if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
 			{
-				indices.GraphicsFamily = i;
+				indices.GraphicsFamily = indices.QueueCount;
 			}
 
 			if (indices.isComplete()) break;
-			i++;
+			indices.QueueCount++;
 		}
 
 		return indices;
@@ -123,6 +127,29 @@ namespace KE::VULKAN
 	{
 		QueueFamilyIndices indices;
 		return indices;
+	}
+
+	KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice)
+	{
+		float QueuePriority = 1.0f;
+		QueueFamilyIndices indices = FindQueueFamilies(_VkPhysicalDevice);
+
+		VkDeviceQueueCreateInfo DeviceQueueInfo{};
+		DeviceQueueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+		DeviceQueueInfo.pNext = VK_NULL_HANDLE;
+		DeviceQueueInfo.queueCount = indices.QueueCount;
+		DeviceQueueInfo.queueFamilyIndex = indices.GraphicsFamily.has_value();
+		DeviceQueueInfo.pQueuePriorities = &QueuePriority; 
+
+		VkPhysicalDeviceFeatures DeviceFeaturesInfo{};
+
+		VkDeviceCreateInfo DeviceInfo{};
+		DeviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+		DeviceInfo.queueCreateInfoCount = 1;
+		DeviceInfo.pQueueCreateInfos = &DeviceQueueInfo;
+		DeviceInfo.pEnabledFeatures = &DeviceFeaturesInfo;
+
+		return KE::KReturn();
 	}
 
 }
