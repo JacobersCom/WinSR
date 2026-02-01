@@ -25,7 +25,7 @@ namespace KE::SYSTEM
 
 	void KRender::CleanUp()
 	{
-
+		vkDestroyDevice(_VkDevice, nullptr);
 	}
 
 }

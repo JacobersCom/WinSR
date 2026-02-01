@@ -49,7 +49,7 @@ namespace KE::VULKAN
 
 	QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
 
-	KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice);
+	KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice);
 }
 
 //May need more error checking

@@ -129,9 +129,12 @@ namespace KE::VULKAN
 		return indices;
 	}
 
-	KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice)
+	//Creates logical device to interface with the different types of queue familys found on the PhysicalDevice
+	KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice)
 	{
+		//Ranges between 0.0 - 1.0
 		float QueuePriority = 1.0f;
+		std::vector<const char*> extentions = GetRequiredExtentions();
 		QueueFamilyIndices indices = FindQueueFamilies(_VkPhysicalDevice);
 
 		VkDeviceQueueCreateInfo DeviceQueueInfo{};
@@ -148,6 +151,23 @@ namespace KE::VULKAN
 		DeviceInfo.queueCreateInfoCount = 1;
 		DeviceInfo.pQueueCreateInfos = &DeviceQueueInfo;
 		DeviceInfo.pEnabledFeatures = &DeviceFeaturesInfo;
+		DeviceInfo.enabledExtensionCount = static_cast<uint32_t>(extentions.size());
+		DeviceInfo.ppEnabledExtensionNames = extentions.data();
+
+		if (enableValidationLayers)
+		{
+			DeviceInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+			DeviceInfo.ppEnabledLayerNames = validationLayers.data();
+		}
+		else
+		{
+			DeviceInfo.enabledLayerCount = 0;
+		}
+
+		if (!vkCreateDevice(_VkPhysicalDevice, &DeviceInfo, nullptr, &_VkDevice))
+		{
+			throw std::runtime_error("Failed to create logical device!");
+		}
 
 		return KE::KReturn();
 	}
