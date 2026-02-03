@@ -25,6 +25,8 @@ namespace KE::SYSTEM
 		KE::SYSTEM::KWindow _win;
 		VkInstance _VkInstance;
 		VkDevice _VkDevice;
+		VkQueue _VkQueue;
+		VkSurfaceKHR _VkSurface;
 		VkPhysicalDevice _VkPhyscialDevice;
 	};
 }

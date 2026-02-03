@@ -17,7 +17,7 @@ namespace KE::VULKAN
 	
 		VkInstanceCreateInfo InstanceInfo{};
 
-		auto extentions = GetRequiredExtentions();
+		auto extentions = GetRequiredInstanceExtentions();
 
 		InstanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		InstanceInfo.pApplicationInfo = &AppInfo;
@@ -42,7 +42,7 @@ namespace KE::VULKAN
 
 	}
 
-	KE::KReturn CreateWin32Surface(HWND _windowHandle, HINSTANCE _windowInstance, VkInstance _VkInstance)
+	KE::KReturn CreateWin32Surface(HWND _windowHandle, HINSTANCE _windowInstance, VkInstance _VkInstance, VkSurfaceKHR& _VkSurface)
 	{
 		VkWin32SurfaceCreateInfoKHR _WinSurfaceInfo{};
 
@@ -50,9 +50,8 @@ namespace KE::VULKAN
 		_WinSurfaceInfo.hwnd = _windowHandle;
 		_WinSurfaceInfo.hinstance = _windowInstance;
 
-		VkSurfaceKHR surface;
 
-		VkResult result = vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &surface);
+		VkResult result = vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &_VkSurface);
 	
 		if (result != VK_SUCCESS)
 		{
@@ -109,15 +108,16 @@ namespace KE::VULKAN
 		vkGetPhysicalDeviceQueueFamilyProperties(_VkPhysicalDevice, &queueFamilyCount, queueFamilys.data());
 
 		//Find the graphics bit queue family
+		int i = 0;
 		for (const auto& queueFamily : queueFamilys)
 		{
 			if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
 			{
-				indices.GraphicsFamily = indices.QueueCount;
+				indices.GraphicsFamily = i;
 			}
 
 			if (indices.isComplete()) break;
-			indices.QueueCount++;
+			i++;
 		}
 
 		return indices;
@@ -130,17 +130,17 @@ namespace KE::VULKAN
 	}
 
 	//Creates logical device to interface with the different types of queue familys found on the PhysicalDevice
-	KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice)
+	KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice, VkQueue _VkQueue)
 	{
 		//Ranges between 0.0 - 1.0
 		float QueuePriority = 1.0f;
-		std::vector<const char*> extentions = GetRequiredExtentions();
+		std::vector<const char*> extentions = GetRequiredInstanceExtentions();
 		QueueFamilyIndices indices = FindQueueFamilies(_VkPhysicalDevice);
 
 		VkDeviceQueueCreateInfo DeviceQueueInfo{};
 		DeviceQueueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 		DeviceQueueInfo.pNext = VK_NULL_HANDLE;
-		DeviceQueueInfo.queueCount = indices.QueueCount;
+		DeviceQueueInfo.queueCount = 1;
 		DeviceQueueInfo.queueFamilyIndex = indices.GraphicsFamily.has_value();
 		DeviceQueueInfo.pQueuePriorities = &QueuePriority; 
 
@@ -151,8 +151,8 @@ namespace KE::VULKAN
 		DeviceInfo.queueCreateInfoCount = 1;
 		DeviceInfo.pQueueCreateInfos = &DeviceQueueInfo;
 		DeviceInfo.pEnabledFeatures = &DeviceFeaturesInfo;
-		DeviceInfo.enabledExtensionCount = static_cast<uint32_t>(extentions.size());
-		DeviceInfo.ppEnabledExtensionNames = extentions.data();
+		DeviceInfo.enabledExtensionCount = 0;
+		DeviceInfo.ppEnabledExtensionNames = VK_NULL_HANDLE;
 
 		if (enableValidationLayers)
 		{
@@ -164,14 +164,17 @@ namespace KE::VULKAN
 			DeviceInfo.enabledLayerCount = 0;
 		}
 
-		if (!vkCreateDevice(_VkPhysicalDevice, &DeviceInfo, nullptr, &_VkDevice))
+		VkResult result = vkCreateDevice(_VkPhysicalDevice, &DeviceInfo, nullptr, &_VkDevice);
+
+		if(result != VK_SUCCESS)
 		{
 			throw std::runtime_error("Failed to create logical device!");
 		}
 
-		return KE::KReturn();
-	}
+		vkGetDeviceQueue(_VkDevice, indices.GraphicsFamily.value(), 0, &_VkQueue);
 
+		return KE::KReturn::K_LOGICAL_DEVICE_CREATION_SUCCESS;
+	}
 }
 
 static bool CheckValidationLayerSupport()
@@ -205,7 +208,7 @@ static bool CheckValidationLayerSupport()
 	return true;
 }
 
-static std::vector<const char*> GetRequiredExtentions()
+static std::vector<const char*> GetRequiredInstanceExtentions()
 {
 	std::vector<const char*> extentions;
 

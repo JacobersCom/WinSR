@@ -12,8 +12,6 @@ int main()
 
 	_render.run();
 
-	KE::VULKAN::CreateWin32Surface(_win.GetWindowHandle(), _win.GetWindowInstance(), _render.GetVkInstance());
-
 	_win.Create();
 	_win.EventDispatcher();
 }

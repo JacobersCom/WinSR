@@ -40,7 +40,7 @@ namespace KE::VULKAN
 	KE::KReturn CreateVkInstance(VkInstance& _VkInstance);
 
 	//Creates a Vulkan Surface for win32
-	KE::KReturn CreateWin32Surface(HWND _windowHandle, HINSTANCE _windowInstance, VkInstance _VkInstance);
+	KE::KReturn CreateWin32Surface(HWND _windowHandle, HINSTANCE _windowInstance, VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
 
 	//Picks a GPU with Vulkan driver support
 	KE::KReturn PickPhyicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance);
@@ -49,11 +49,11 @@ namespace KE::VULKAN
 
 	QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
 
-	KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice);
+	KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice, VkQueue _VkQueue);
 }
 
 //May need more error checking
 static bool CheckValidationLayerSupport();
-static std::vector<const char*> GetRequiredExtentions();
+static std::vector<const char*> GetRequiredInstanceExtentions();
 static bool IsDeviceSuitable(VkPhysicalDevice _VkPhysicalDevice);
 
