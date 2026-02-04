@@ -175,6 +175,20 @@ namespace KE::VULKAN
 
 		return KE::KReturn::K_LOGICAL_DEVICE_CREATION_SUCCESS;
 	}
+	void SetUpDebuggerMessage()
+	{
+		if (!enableValidationLayers)return;
+
+		VkDebugUtilsMessengerEXT _VkDebugMessenger;
+		VkDebugUtilsMessengerCreateInfoEXT _VkDebugCreateInfo{};
+
+		_VkDebugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+		_VkDebugCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+		_VkDebugCreateInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+		_VkDebugCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+		_VkDebugCreateInfo.pfnUserCallback = DebugCallBack;
+		_VkDebugCreateInfo.pUserData = nullptr; // Optional
+	}
 }
 
 static bool CheckValidationLayerSupport()
@@ -235,4 +249,12 @@ static bool IsDeviceSuitable(VkPhysicalDevice _VkPhysicalDevice)
 
 	return _VkDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
 		_VkDeviceFeatures.geometryShader;
+}
+
+VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallBack(VkDebugUtilsMessageSeverityFlagBitsEXT _MessageSeverity, VkDebugUtilsMessageTypeFlagsEXT _MessageType, const VkDebugUtilsMessengerCallbackDataEXT* _pCallBackData, void* _pUserData)
+{
+
+	std::cerr << "Validation Layer: " << _pCallBackData->pMessage << std::endl;
+
+	return VK_FALSE;
 }
