@@ -116,6 +116,7 @@ namespace KE::VULKAN
 				indices.GraphicsFamily = i;
 			}
 
+
 			if (indices.isComplete()) break;
 			i++;
 		}
@@ -227,12 +228,7 @@ static std::vector<const char*> GetRequiredInstanceExtentions()
 //If the device has the properties and feature needed
 static bool IsDeviceSuitable(VkPhysicalDevice _VkPhysicalDevice)
 {
-	VkPhysicalDeviceProperties _VkDeviceProperties;
-	VkPhysicalDeviceFeatures _VkDeviceFeatures;
+	QueueFamilyIndices Indices = KE::VULKAN::FindQueueFamilies(_VkPhysicalDevice);
 
-	vkGetPhysicalDeviceProperties(_VkPhysicalDevice, &_VkDeviceProperties);
-	vkGetPhysicalDeviceFeatures(_VkPhysicalDevice, &_VkDeviceFeatures);
-
-	return _VkDeviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
-		_VkDeviceFeatures.geometryShader;
+	return Indices.isComplete();
 }

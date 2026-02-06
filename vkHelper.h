@@ -19,11 +19,13 @@
 static struct QueueFamilyIndices {
 
 	std::optional<uint32_t>(GraphicsFamily);
-	uint32_t QueueCount = 0;
+	std::optional<uint32_t>(PresentFamily);
+	
 
 	bool isComplete()
 	{
 		return GraphicsFamily.has_value();
+
 	}
 };
 

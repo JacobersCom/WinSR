@@ -15,7 +15,6 @@ namespace KE::SYSTEM
 		KE::VULKAN::CreateVkInstance(_VkInstance);
 		KE::VULKAN::CreateWin32Surface(_win.GetWindowHandle(), _win.GetWindowInstance(), _VkInstance, _VkSurface);
 		KE::VULKAN::PickPhyicalDevice(_VkPhyscialDevice, _VkInstance);
-		KE::VULKAN::FindQueueFamilies(_VkPhyscialDevice);
 		KE::VULKAN::CreateLogicalDevice(_VkPhyscialDevice, _VkDevice, _VkQueue);
 		return KE::KReturn::K_SUCCESS;
 	}
