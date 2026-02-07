@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include <optional>
+#include <set>
 
 #include "KReturn.h"
 #include "vulkan/vulkan.h"
@@ -16,6 +17,8 @@
 	const bool enableValidationLayers = true;
 #endif
 
+static VkSurfaceKHR _VkSurface;
+
 static struct QueueFamilyIndices {
 
 	std::optional<uint32_t>(GraphicsFamily);
@@ -24,7 +27,7 @@ static struct QueueFamilyIndices {
 
 	bool isComplete()
 	{
-		return GraphicsFamily.has_value();
+		return GraphicsFamily.has_value() && PresentFamily.has_value();
 
 	}
 };

@@ -115,7 +115,14 @@ namespace KE::VULKAN
 			{
 				indices.GraphicsFamily = i;
 			}
+			
+			VkBool32 PresentationSupport; 
+			vkGetPhysicalDeviceSurfaceSupportKHR(_VkPhysicalDevice, i, _VkSurface, &PresentationSupport);
 
+			if (PresentationSupport)
+			{
+				indices.PresentFamily = i;
+			}
 
 			if (indices.isComplete()) break;
 			i++;
@@ -133,24 +140,34 @@ namespace KE::VULKAN
 	//Creates logical device to interface with the different types of queue familys found on the PhysicalDevice
 	KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice, VkQueue& _VkQueue)
 	{
+		
 		//Ranges between 0.0 - 1.0
 		float QueuePriority = 1.0f;
+		
 		std::vector<const char*> extentions = GetRequiredInstanceExtentions();
+		
 		QueueFamilyIndices indices = FindQueueFamilies(_VkPhysicalDevice);
+		std::set<uint32_t> UnqiueQueueFamilys = { indices.GraphicsFamily.value(), indices.PresentFamily.value() };
 
-		VkDeviceQueueCreateInfo DeviceQueueInfo{};
-		DeviceQueueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-		DeviceQueueInfo.pNext = VK_NULL_HANDLE;
-		DeviceQueueInfo.queueCount = 1;
-		DeviceQueueInfo.queueFamilyIndex = indices.GraphicsFamily.value();
-		DeviceQueueInfo.pQueuePriorities = &QueuePriority; 
+		std::vector<VkDeviceQueueCreateInfo> DeviceQueueInfoVec;
+		for (const auto& queueFamily : UnqiueQueueFamilys)
+		{
+			VkDeviceQueueCreateInfo DeviceQueueInfo{};
+			DeviceQueueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			DeviceQueueInfo.pNext = VK_NULL_HANDLE;
+			DeviceQueueInfo.queueCount = 1;
+			DeviceQueueInfo.queueFamilyIndex = queueFamily;
+			DeviceQueueInfo.pQueuePriorities = &QueuePriority; 
+			DeviceQueueInfoVec.push_back(DeviceQueueInfo);
+		}
+
 
 		VkPhysicalDeviceFeatures DeviceFeaturesInfo{};
 
 		VkDeviceCreateInfo DeviceInfo{};
 		DeviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		DeviceInfo.queueCreateInfoCount = 1;
-		DeviceInfo.pQueueCreateInfos = &DeviceQueueInfo;
+		DeviceInfo.queueCreateInfoCount = static_cast<uint32_t>(DeviceQueueInfoVec.size());
+		DeviceInfo.pQueueCreateInfos = DeviceQueueInfoVec.data();
 		DeviceInfo.pEnabledFeatures = &DeviceFeaturesInfo;
 		DeviceInfo.enabledExtensionCount = 0;
 		DeviceInfo.ppEnabledExtensionNames = VK_NULL_HANDLE;
@@ -172,7 +189,7 @@ namespace KE::VULKAN
 			throw std::runtime_error("Failed to create logical device!");
 		}
 
-		vkGetDeviceQueue(_VkDevice, indices.GraphicsFamily.value(), 0, &_VkQueue);
+		vkGetDeviceQueue(_VkDevice, indices.PresentFamily.value(), 0, &_VkQueue);
 
 		return KE::KReturn::K_LOGICAL_DEVICE_CREATION_SUCCESS;
 	}
