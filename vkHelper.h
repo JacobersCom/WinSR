@@ -51,15 +51,13 @@ namespace KE::VULKAN
 
 	QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
 
-	KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice, VkQueue _VkQueue);
+	KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice, VkQueue& _VkQueue);
 	
-	void SetUpDebuggerMessage();
+	
 }
 
 //May need more error checking
 static bool CheckValidationLayerSupport();
 static std::vector<const char*> GetRequiredInstanceExtentions();
 static bool IsDeviceSuitable(VkPhysicalDevice _VkPhysicalDevice);
-static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallBack(VkDebugUtilsMessageSeverityFlagBitsEXT _MessageSeverity, VkDebugUtilsMessageTypeFlagsEXT _MessageType,
-	const VkDebugUtilsMessengerCallbackDataEXT* _pCallBackData, void* _pUserData);
 

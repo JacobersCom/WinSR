@@ -131,7 +131,7 @@ namespace KE::VULKAN
 	}
 
 	//Creates logical device to interface with the different types of queue familys found on the PhysicalDevice
-	KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice, VkQueue _VkQueue)
+	KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice, VkQueue& _VkQueue)
 	{
 		//Ranges between 0.0 - 1.0
 		float QueuePriority = 1.0f;
@@ -142,7 +142,7 @@ namespace KE::VULKAN
 		DeviceQueueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 		DeviceQueueInfo.pNext = VK_NULL_HANDLE;
 		DeviceQueueInfo.queueCount = 1;
-		DeviceQueueInfo.queueFamilyIndex = indices.GraphicsFamily.has_value();
+		DeviceQueueInfo.queueFamilyIndex = indices.GraphicsFamily.value();
 		DeviceQueueInfo.pQueuePriorities = &QueuePriority; 
 
 		VkPhysicalDeviceFeatures DeviceFeaturesInfo{};
