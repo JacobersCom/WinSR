@@ -3,7 +3,7 @@
 #include "vkHelper.h"
 #include "KWindow.h" 
 
-namespace KE::SYSTEM
+namespace KE::RENDERER
 {
 	class KRender
 	{
@@ -15,6 +15,7 @@ namespace KE::SYSTEM
 
 	private:
 
+		KE::KReturn CreateVkInstance(VkInstance& _Instance);
 		KE::KReturn InitVulkan();
 		void UpdateLoop();
 		void CleanUp();
