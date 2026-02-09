@@ -1,10 +1,32 @@
 #pragma once
 
+#include <optional>
+
 #include "vkHelper.h"
 #include "KWindow.h" 
 
+#ifdef NDEBUG
+static const bool enableValidationLayers = false;
+#else 
+static const bool enableValidationLayers = true;
+#endif
+
 namespace KE::RENDERER
 {
+
+	struct QueueFamilyIndices {
+
+		std::optional<uint32_t>(GraphicsFamily);
+		std::optional<uint32_t>(PresentFamily);
+
+
+		bool isComplete()
+		{
+			return GraphicsFamily.has_value();
+
+		}
+	};
+
 	class KRender
 	{
 	public:
@@ -19,6 +41,8 @@ namespace KE::RENDERER
 		KE::KReturn CreateWin32Surface(HWND _windowHandle, HINSTANCE _windowInstance, 
 			VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
 		KE::KReturn PickPhysicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance);
+		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
+		
 		KE::KReturn InitVulkan();
 		void UpdateLoop();
 		void CleanUp();
@@ -32,5 +56,7 @@ namespace KE::RENDERER
 		VkQueue _VkQueue;
 		VkSurfaceKHR _VkSurface;
 		VkPhysicalDevice _VkPhyscialDevice;
+
+		static std::vector<const char*> validationLayers;
 	};
 }

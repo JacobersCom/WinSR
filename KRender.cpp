@@ -121,4 +121,33 @@ namespace KE::RENDERER
 
 		return KE::KReturn::K_SUCCESS;
 	}
+
+	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice)
+	{
+		QueueFamilyIndices indices;
+
+		//Get the properties count
+		uint32_t queueFamilyCount = 0;
+		vkGetPhysicalDeviceQueueFamilyProperties(_VkPhysicalDevice, &queueFamilyCount, nullptr);
+
+		//Get the properties data
+		std::vector<VkQueueFamilyProperties> queueFamilys(queueFamilyCount);
+		vkGetPhysicalDeviceQueueFamilyProperties(_VkPhysicalDevice, &queueFamilyCount, queueFamilys.data());
+
+		//Find the graphics bit queue family
+		int i = 0;
+		for (const auto& queueFamily : queueFamilys)
+		{
+			if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
+			{
+				indices.GraphicsFamily = i;
+			}
+
+
+			if (indices.isComplete()) break;
+			i++;
+		}
+
+		return indices;
+	}
 }
