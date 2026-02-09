@@ -42,7 +42,8 @@ namespace KE::RENDERER
 			VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
 		KE::KReturn PickPhysicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance);
 		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
-		
+		QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
+		KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice, VkQueue _VkQueue);
 		KE::KReturn InitVulkan();
 		void UpdateLoop();
 		void CleanUp();
