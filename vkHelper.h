@@ -38,14 +38,10 @@ static std::vector<const char*> validationLayers = {
 namespace KE::VULKAN
 {
 
-	//Creates a Instance of the vulkan API
-	KE::KReturn CreateVkInstance(VkInstance& _VkInstance);
 
 	//Creates a Vulkan Surface for win32
-	KE::KReturn CreateWin32Surface(HWND _windowHandle, HINSTANCE _windowInstance, VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
 
 	//Picks a GPU with Vulkan driver support
-	KE::KReturn PickPhyicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance);
 	
 	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
 

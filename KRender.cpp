@@ -89,4 +89,36 @@ namespace KE::RENDERER
 		return KE::KReturn::K_SUCCESS;
 	}
 
+	KE::KReturn KRender::PickPhysicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance)
+	{
+		//Get device count
+		uint32_t deviceCount = 0;
+		vkEnumeratePhysicalDevices(_VkInstance, &deviceCount, nullptr);
+
+		if (deviceCount == 0)
+		{
+			throw std::runtime_error("No device with vulkan support found!");
+		}
+
+		//Get device information
+		std::vector<VkPhysicalDevice> devices(deviceCount);
+		vkEnumeratePhysicalDevices(_VkInstance, &deviceCount, devices.data());
+
+		//Find a suitable device with vulkan support
+		for (const auto device : devices)
+		{
+			if (IsDeviceSuitable(device))
+			{
+				_VkPhysicalDevice = device;
+				break;
+			}
+		}
+
+		if (_VkPhysicalDevice == VK_NULL_HANDLE)
+		{
+			throw std::runtime_error("Failed to find Suitable GPU");
+		}
+
+		return KE::KReturn::K_SUCCESS;
+	}
 }

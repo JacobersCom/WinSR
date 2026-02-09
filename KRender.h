@@ -18,6 +18,7 @@ namespace KE::RENDERER
 		KE::KReturn CreateVkInstance(VkInstance& _Instance);
 		KE::KReturn CreateWin32Surface(HWND _windowHandle, HINSTANCE _windowInstance, 
 			VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
+		KE::KReturn PickPhysicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance);
 		KE::KReturn InitVulkan();
 		void UpdateLoop();
 		void CleanUp();
