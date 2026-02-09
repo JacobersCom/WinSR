@@ -70,4 +70,23 @@ namespace KE::RENDERER
 		return KE::KReturn::K_SUCCESS;
 	}
 
+	KE::KReturn KRender::CreateWin32Surface(HWND _windowHandle, HINSTANCE _windowInstance, VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR)
+	{
+		VkWin32SurfaceCreateInfoKHR _WinSurfaceInfo{};
+
+		_WinSurfaceInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+		_WinSurfaceInfo.hwnd = _windowHandle;
+		_WinSurfaceInfo.hinstance = _windowInstance;
+
+
+		VkResult result = vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &_VkSurface);
+
+		if (result != VK_SUCCESS)
+		{
+			throw std::runtime_error("Win32 Surface creation failed");
+		}
+
+		return KE::KReturn::K_SUCCESS;
+	}
+
 }
