@@ -12,10 +12,10 @@ namespace KE::RENDERER
 
 	KReturn KRender::InitVulkan() 
 	{
-		KE::VULKAN::CreateVkInstance(_VkInstance);
-		KE::VULKAN::CreateWin32Surface(_win.GetWindowHandle(), _win.GetWindowInstance(), _VkInstance, _VkSurface);
-		KE::VULKAN::PickPhyicalDevice(_VkPhyscialDevice, _VkInstance);
-		KE::VULKAN::CreateLogicalDevice(_VkPhyscialDevice, _VkDevice, _VkQueue);
+		KE::RENDERER::KRender::CreateVkInstance(_VkInstance);
+		KE::RENDERER::KRender::CreateWin32Surface(_win.GetWindowHandle(), _win.GetWindowInstance(), _VkInstance, _VkSurface);
+		KE::RENDERER::KRender::PickPhysicalDevice(_VkPhyscialDevice, _VkInstance);
+		KE::RENDERER::KRender::CreateLogicalDevice(_VkPhyscialDevice, _VkDevice, _VkQueue);
 		return KE::KReturn::K_SUCCESS;
 	}
 
@@ -30,6 +30,7 @@ namespace KE::RENDERER
 		vkDestroySurfaceKHR(_VkInstance, _VkSurface, nullptr);
 		vkDestroyDevice(_VkDevice, nullptr);
 	}
+
 
 	KReturn KRender::CreateVkInstance(VkInstance& _VkInstance)
 	{
@@ -122,7 +123,7 @@ namespace KE::RENDERER
 		return KE::KReturn::K_SUCCESS;
 	}
 
-	QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice)
+	KE::RENDERER::QueueFamilyIndices KRender::FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice)
 	{
 		QueueFamilyIndices indices;
 
@@ -151,13 +152,13 @@ namespace KE::RENDERER
 		return indices;
 	}
 
-	QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice)
+	KE::RENDERER::QueueFamilyIndices KRender::GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice)
 	{
 		QueueFamilyIndices indices;
 		return indices;
 	}
 
-	KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice, VkQueue _VkQueue)
+	KE::KReturn KE::RENDERER::KRender::CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice, VkQueue _VkQueue)
 	{
 		//Ranges between 0.0 - 1.0
 		float QueuePriority = 1.0f;
@@ -201,5 +202,70 @@ namespace KE::RENDERER
 		vkGetDeviceQueue(_VkDevice, indices.GraphicsFamily.value(), 0, &_VkQueue);
 
 		return KE::KReturn::K_LOGICAL_DEVICE_CREATION_SUCCESS;
+	}
+	
+	bool KRender::CheckValidationLayerSupport()
+	{
+		uint32_t layerCount;
+
+		vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+		std::vector<VkLayerProperties> availableLayers(layerCount);
+
+		vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+		validationLayers = GetRequiredInstaceLayers();
+
+		for (const char* layerName : validationLayers)
+		{
+			bool layerFound = false;
+
+			for (const auto& layerProperties : availableLayers)
+			{
+				if (strcmp(layerName, layerProperties.layerName))
+				{
+					layerFound = true;
+					break;
+				}
+			}
+			if (!layerFound)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	std::vector<const char*> KRender::GetRequiredInstanceExtentions()
+	{
+		std::vector<const char*> extentions;
+
+		if (enableValidationLayers)
+		{
+			extentions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+		}
+
+		extentions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+		extentions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+
+		return extentions;
+	}
+
+	std::vector<const char*> KRender::GetRequiredInstaceLayers()
+	{
+		std::vector<const char*> layers;
+		
+		if (enableValidationLayers)
+		{
+			layers.push_back("VK_LAYER_KHRONOS_validation");
+		}
+		return layers;
+	}
+
+	bool KRender::IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice)
+	{
+		QueueFamilyIndices Indices = KRender::FindQueueFamilies(_VkPhyscialDevice);
+
+		return Indices.isComplete();
 	}
 }

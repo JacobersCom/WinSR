@@ -1,9 +1,14 @@
 #pragma once
 
+#define VK_USE_PLATFORM_WIN32_KHR
+
+#include <iostream>
+#include <vector>
 #include <optional>
 
-#include "vkHelper.h"
+#include "vulkan/vulkan.h"
 #include "KWindow.h" 
+#include "KReturn.h"
 
 #ifdef NDEBUG
 static const bool enableValidationLayers = false;
@@ -39,15 +44,23 @@ namespace KE::RENDERER
 
 		KE::KReturn CreateVkInstance(VkInstance& _Instance);
 		KE::KReturn CreateWin32Surface(HWND _windowHandle, HINSTANCE _windowInstance, 
-			VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
+		VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
+		
 		KE::KReturn PickPhysicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance);
-		QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
-		QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
+		
+		KE::RENDERER::QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
+		KE::RENDERER::QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
+		
 		KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice, VkQueue _VkQueue);
 		KE::KReturn InitVulkan();
+		
 		void UpdateLoop();
 		void CleanUp();
 
+		bool CheckValidationLayerSupport();
+		std::vector<const char*> GetRequiredInstanceExtentions();
+		std::vector<const char*> GetRequiredInstaceLayers();
+		bool IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice);
 
 	private:
 
@@ -58,6 +71,6 @@ namespace KE::RENDERER
 		VkSurfaceKHR _VkSurface;
 		VkPhysicalDevice _VkPhyscialDevice;
 
-		static std::vector<const char*> validationLayers;
+		std::vector<const char*> validationLayers;
 	};
 }
