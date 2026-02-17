@@ -13,7 +13,7 @@ namespace KE::RENDERER
 	KReturn KRender::InitVulkan() 
 	{
 		KE::RENDERER::KRender::CreateVkInstance(_VkInstance);
-		KE::RENDERER::KRender::CreateWin32Surface(_win.GetWindowHandle(), _win.GetWindowInstance(), _VkInstance, _VkSurface);
+		KE::RENDERER::KRender::CreateWin32Surface(_win, _VkInstance, _VkSurface);
 		KE::RENDERER::KRender::PickPhysicalDevice(_VkPhyscialDevice, _VkInstance);
 		KE::RENDERER::KRender::CreateLogicalDevice(_VkPhyscialDevice, _VkDevice, _VkQueue);
 		return KE::KReturn::K_SUCCESS;
@@ -71,13 +71,14 @@ namespace KE::RENDERER
 		return KE::KReturn::K_SUCCESS;
 	}
 
-	KE::KReturn KRender::CreateWin32Surface(HWND _windowHandle, HINSTANCE _windowInstance, VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR)
+	KE::KReturn KRender::CreateWin32Surface(KE::SYSTEM::KWindow& _win, VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR)
 	{
+
 		VkWin32SurfaceCreateInfoKHR _WinSurfaceInfo{};
 
 		_WinSurfaceInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-		_WinSurfaceInfo.hwnd = _windowHandle;
-		_WinSurfaceInfo.hinstance = _windowInstance;
+		_WinSurfaceInfo.hwnd = _win.GetWindowHandle();
+		_WinSurfaceInfo.hinstance = _win.GetWindowInstance();
 
 
 		VkResult result = vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &_VkSurface);

@@ -7,7 +7,7 @@
 #include <optional>
 
 #include "vulkan/vulkan.h"
-#include "KWindow.h" 
+#include "KWindow.h"
 #include "KReturn.h"
 
 #ifdef NDEBUG
@@ -36,18 +36,17 @@ namespace KE::RENDERER
 	{
 	public:
 
+		KRender(KE::SYSTEM::KWindow& _win) : _win(_win){}
+
 		void run();
 
 		const VkInstance GetVkInstance() { return _VkInstance; }
-
+		
 	private:
 
 		KE::KReturn CreateVkInstance(VkInstance& _Instance);
-		KE::KReturn CreateWin32Surface(HWND _windowHandle, HINSTANCE _windowInstance, 
-		VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
-		
 		KE::KReturn PickPhysicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance);
-		
+		KE::KReturn CreateWin32Surface(KE::SYSTEM::KWindow& _win, VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
 		KE::RENDERER::QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
 		KE::RENDERER::QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
 		
@@ -64,7 +63,7 @@ namespace KE::RENDERER
 
 	private:
 
-		KE::SYSTEM::KWindow _win;
+		KE::SYSTEM::KWindow& _win;
 		VkInstance _VkInstance;
 		VkDevice _VkDevice;
 		VkQueue _VkQueue;
