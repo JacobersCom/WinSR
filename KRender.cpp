@@ -55,7 +55,7 @@ namespace KE::RENDERER
 		InstanceInfo.enabledExtensionCount = static_cast<uint32_t>(extentions.size());
 		InstanceInfo.ppEnabledExtensionNames = extentions.data();
 
-		if (enableValidationLayers && !CheckValidationLayerSupport())
+		if (enableValidationLayers && !CheckDeviceExtensionSupport())
 		{
 			throw std::runtime_error("Validation layers requested, but not available");
 		}
@@ -255,6 +255,33 @@ namespace KE::RENDERER
 		return true;
 	}
 
+	bool KRender::IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice)
+	{
+		QueueFamilyIndices Indices = KRender::FindQueueFamilies(_VkPhyscialDevice);
+
+		bool extensionsSupported = CheckDeviceExtensionSupport(_VkPhyscialDevice);
+
+		return Indices.isComplete();
+	}
+
+	bool KRender::CheckDeviceExtensionSupport(VkPhysicalDevice _VkPhysicalDevice)
+	{
+		uint32_t extensionCount;
+		vkEnumerateDeviceExtensionProperties(_VkPhysicalDevice, nullptr, &extensionCount, nullptr);
+
+		std::vector<VkExtensionProperties> availableExtension(extensionCount);
+		vkEnumerateDeviceExtensionProperties(_VkPhysicalDevice, nullptr, &extensionCount, availableExtension.data());
+
+		std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+
+		for (const auto& extension : availableExtension)
+		{
+			requiredExtensions.erase(extension.extensionName);
+		}
+
+		return requiredExtensions.empty();
+	}
+
 	std::vector<const char*> KRender::GetRequiredInstanceExtentions()
 	{
 		std::vector<const char*> extentions;
@@ -266,6 +293,7 @@ namespace KE::RENDERER
 
 		extentions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
 		extentions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+		extentions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
 		return extentions;
 	}
@@ -281,10 +309,4 @@ namespace KE::RENDERER
 		return layers;
 	}
 
-	bool KRender::IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice)
-	{
-		QueueFamilyIndices Indices = KRender::FindQueueFamilies(_VkPhyscialDevice);
-
-		return Indices.isComplete();
-	}
 }
