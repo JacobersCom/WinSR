@@ -15,7 +15,7 @@ namespace KE::RENDERER
 		KE::RENDERER::KRender::CreateVkInstance(_VkInstance);
 		KE::RENDERER::KRender::CreateWin32Surface(_win, _VkInstance, _VkSurface);
 		KE::RENDERER::KRender::PickPhysicalDevice(_VkPhyscialDevice, _VkInstance);
-		KE::RENDERER::KRender::CreateLogicalDevice(_VkPhyscialDevice, _VkDevice, _VkQueue);
+		KE::RENDERER::KRender::CreateLogicalDevice(_VkPhyscialDevice, _VkDevice);
 		return KE::KReturn::K_SUCCESS;
 	}
 
@@ -137,7 +137,8 @@ namespace KE::RENDERER
 		vkGetPhysicalDeviceQueueFamilyProperties(_VkPhysicalDevice, &queueFamilyCount, queueFamilys.data());
 
 		//Find the graphics bit queue family
-		int i = 0;
+		int i = 0; 
+		VkBool32 presentSupport = false;
 		for (const auto& queueFamily : queueFamilys)
 		{
 			if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
@@ -145,6 +146,12 @@ namespace KE::RENDERER
 				indices.GraphicsFamily = i;
 			}
 
+			vkGetPhysicalDeviceSurfaceSupportKHR(_VkPhysicalDevice, i, _VkSurface, &presentSupport);
+
+			if (presentSupport)
+			{
+				indices.PresentFamily = i;
+			}
 
 			if (indices.isComplete()) break;
 			i++;
@@ -159,26 +166,35 @@ namespace KE::RENDERER
 		return indices;
 	}
 
-	KE::KReturn KE::RENDERER::KRender::CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice, VkQueue _VkQueue)
+	KE::KReturn KE::RENDERER::KRender::CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice)
 	{
 		//Ranges between 0.0 - 1.0
 		float QueuePriority = 1.0f;
+
 		std::vector<const char*> extentions = GetRequiredInstanceExtentions();
 		QueueFamilyIndices indices = FindQueueFamilies(_VkPhysicalDevice);
 
-		VkDeviceQueueCreateInfo DeviceQueueInfo{};
-		DeviceQueueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-		DeviceQueueInfo.pNext = VK_NULL_HANDLE;
-		DeviceQueueInfo.queueCount = 1;
-		DeviceQueueInfo.queueFamilyIndex = indices.GraphicsFamily.has_value();
-		DeviceQueueInfo.pQueuePriorities = &QueuePriority;
+		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+		std::set<uint32_t> uniqueQueueFamilies = { indices.GraphicsFamily.value(), indices.PresentFamily.value() };
+
+		for (uint32_t queueFamily : uniqueQueueFamilies)
+		{
+			VkDeviceQueueCreateInfo DeviceQueueInfo{};
+			DeviceQueueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			DeviceQueueInfo.pNext = VK_NULL_HANDLE;
+			DeviceQueueInfo.queueCount = 1;
+			DeviceQueueInfo.queueFamilyIndex = queueFamily;
+			DeviceQueueInfo.pQueuePriorities = &QueuePriority;
+			queueCreateInfos.push_back(DeviceQueueInfo);
+		}
+
 
 		VkPhysicalDeviceFeatures DeviceFeaturesInfo{};
 
 		VkDeviceCreateInfo DeviceInfo{};
 		DeviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		DeviceInfo.queueCreateInfoCount = 1;
-		DeviceInfo.pQueueCreateInfos = &DeviceQueueInfo;
+		DeviceInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+		DeviceInfo.pQueueCreateInfos = queueCreateInfos.data();
 		DeviceInfo.pEnabledFeatures = &DeviceFeaturesInfo;
 		DeviceInfo.enabledExtensionCount = 0;
 		DeviceInfo.ppEnabledExtensionNames = VK_NULL_HANDLE;
@@ -200,7 +216,9 @@ namespace KE::RENDERER
 			throw std::runtime_error("Failed to create logical device!");
 		}
 
-		vkGetDeviceQueue(_VkDevice, indices.GraphicsFamily.value(), 0, &_VkQueue);
+		vkGetDeviceQueue(_VkDevice, indices.GraphicsFamily.value(), 0, &_VkGraphicsQueue);
+		vkGetDeviceQueue(_VkDevice, indices.GraphicsFamily.value(), 0, &_VkPresentationQueue);
+
 
 		return KE::KReturn::K_LOGICAL_DEVICE_CREATION_SUCCESS;
 	}

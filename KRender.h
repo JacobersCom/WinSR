@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <optional>
+#include <set>
 
 #include "vulkan/vulkan.h"
 #include "KWindow.h"
@@ -27,8 +28,7 @@ namespace KE::RENDERER
 
 		bool isComplete()
 		{
-			return GraphicsFamily.has_value();
-
+			return GraphicsFamily.has_value() && PresentFamily.has_value();
 		}
 	};
 
@@ -49,8 +49,7 @@ namespace KE::RENDERER
 		KE::KReturn CreateWin32Surface(KE::SYSTEM::KWindow& _win, VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
 		KE::RENDERER::QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
 		KE::RENDERER::QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
-		
-		KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice, VkQueue _VkQueue);
+		KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice);
 		KE::KReturn InitVulkan();
 		
 		void UpdateLoop();
@@ -66,7 +65,8 @@ namespace KE::RENDERER
 		KE::SYSTEM::KWindow& _win;
 		VkInstance _VkInstance;
 		VkDevice _VkDevice;
-		VkQueue _VkQueue;
+		VkQueue _VkGraphicsQueue;
+		VkQueue _VkPresentationQueue;
 		VkSurfaceKHR _VkSurface;
 		VkPhysicalDevice _VkPhyscialDevice;
 
