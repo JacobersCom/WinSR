@@ -55,7 +55,7 @@ namespace KE::RENDERER
 		InstanceInfo.enabledExtensionCount = static_cast<uint32_t>(extentions.size());
 		InstanceInfo.ppEnabledExtensionNames = extentions.data();
 
-		if (enableValidationLayers && !CheckDeviceExtensionSupport())
+		if (enableValidationLayers)
 		{
 			throw std::runtime_error("Validation layers requested, but not available");
 		}
@@ -223,64 +223,18 @@ namespace KE::RENDERER
 		return KE::KReturn::K_LOGICAL_DEVICE_CREATION_SUCCESS;
 	}
 	
-	bool KRender::CheckValidationLayerSupport()
-	{
-		uint32_t layerCount;
-
-		vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-
-		std::vector<VkLayerProperties> availableLayers(layerCount);
-
-		vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-
-		validationLayers = GetRequiredInstaceLayers();
-
-		for (const char* layerName : validationLayers)
-		{
-			bool layerFound = false;
-
-			for (const auto& layerProperties : availableLayers)
-			{
-				if (strcmp(layerName, layerProperties.layerName))
-				{
-					layerFound = true;
-					break;
-				}
-			}
-			if (!layerFound)
-			{
-				return false;
-			}
-		}
-		return true;
-	}
+	
 
 	bool KRender::IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice)
 	{
 		QueueFamilyIndices Indices = KRender::FindQueueFamilies(_VkPhyscialDevice);
 
-		bool extensionsSupported = CheckDeviceExtensionSupport(_VkPhyscialDevice);
+		
 
 		return Indices.isComplete();
 	}
 
-	bool KRender::CheckDeviceExtensionSupport(VkPhysicalDevice _VkPhysicalDevice)
-	{
-		uint32_t extensionCount;
-		vkEnumerateDeviceExtensionProperties(_VkPhysicalDevice, nullptr, &extensionCount, nullptr);
-
-		std::vector<VkExtensionProperties> availableExtension(extensionCount);
-		vkEnumerateDeviceExtensionProperties(_VkPhysicalDevice, nullptr, &extensionCount, availableExtension.data());
-
-		std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
-
-		for (const auto& extension : availableExtension)
-		{
-			requiredExtensions.erase(extension.extensionName);
-		}
-
-		return requiredExtensions.empty();
-	}
+	
 
 	std::vector<const char*> KRender::GetRequiredInstanceExtentions()
 	{
