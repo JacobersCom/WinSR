@@ -55,10 +55,10 @@ namespace KE::RENDERER
 		void UpdateLoop();
 		void CleanUp();
 
-		bool CheckValidationLayerSupport();
 		std::vector<const char*> GetRequiredInstanceExtentions();
 		std::vector<const char*> GetRequiredInstaceLayers();
 		bool IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice);
+		
 
 	private:
 

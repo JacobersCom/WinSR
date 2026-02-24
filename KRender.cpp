@@ -55,7 +55,7 @@ namespace KE::RENDERER
 		InstanceInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
 		InstanceInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
-		if (enableValidationLayers && !CheckValidationLayerSupport())
+		if (enableValidationLayers)
 		{
 			throw std::runtime_error("Validation layers requested, but not available");
 		}
@@ -222,37 +222,18 @@ namespace KE::RENDERER
 		return KE::KReturn::K_LOGICAL_DEVICE_CREATION_SUCCESS;
 	}
 	
-	bool KRender::CheckValidationLayerSupport()
+	
+
+	bool KRender::IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice)
 	{
-		uint32_t layerCount;
+		QueueFamilyIndices Indices = KRender::FindQueueFamilies(_VkPhyscialDevice);
 
-		vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+		
 
-		std::vector<VkLayerProperties> availableLayers(layerCount);
-
-		vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-
-		validationLayers = GetRequiredInstaceLayers();
-
-		for (const char* layerName : validationLayers)
-		{
-			bool layerFound = false;
-
-			for (const auto& layerProperties : availableLayers)
-			{
-				if (strcmp(layerName, layerProperties.layerName))
-				{
-					layerFound = true;
-					break;
-				}
-			}
-			if (!layerFound)
-			{
-				return false;
-			}
-		}
-		return true;
+		return Indices.isComplete();
 	}
+
+	
 
 	std::vector<const char*> KRender::GetRequiredInstanceExtentions()
 	{
@@ -281,10 +262,4 @@ namespace KE::RENDERER
 		return layers;
 	}
 
-	bool KRender::IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice)
-	{
-		QueueFamilyIndices Indices = KRender::FindQueueFamilies(_VkPhyscialDevice);
-
-		return Indices.isComplete();
-	}
 }
