@@ -47,13 +47,13 @@ namespace KE::RENDERER
 
 		VkInstanceCreateInfo InstanceInfo{};
 
-		auto extentions = GetRequiredInstanceExtentions();
+		deviceExtensions = GetRequiredInstanceExtentions();
 
 		InstanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		InstanceInfo.pApplicationInfo = &AppInfo;
 		InstanceInfo.pNext = VK_NULL_HANDLE;
-		InstanceInfo.enabledExtensionCount = static_cast<uint32_t>(extentions.size());
-		InstanceInfo.ppEnabledExtensionNames = extentions.data();
+		InstanceInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+		InstanceInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
 		if (enableValidationLayers && !CheckValidationLayerSupport())
 		{
@@ -64,7 +64,6 @@ namespace KE::RENDERER
 			InstanceInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
 			InstanceInfo.ppEnabledLayerNames = validationLayers.data();
 		}
-
 
 		vkCreateInstance(&InstanceInfo, nullptr, &_VkInstance);
 
@@ -266,6 +265,7 @@ namespace KE::RENDERER
 
 		extentions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
 		extentions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+		extentions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
 		return extentions;
 	}

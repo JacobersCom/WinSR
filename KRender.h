@@ -71,5 +71,6 @@ namespace KE::RENDERER
 		VkPhysicalDevice _VkPhyscialDevice;
 
 		std::vector<const char*> validationLayers;
+		std::vector<const char*> deviceExtensions;
 	};
 }
