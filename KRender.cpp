@@ -266,6 +266,7 @@ namespace KE::RENDERER
 
 		extentions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
 		extentions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+		extentions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
 		return extentions;
 	}
