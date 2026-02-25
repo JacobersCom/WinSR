@@ -47,7 +47,7 @@ namespace KE::RENDERER
 
 		VkInstanceCreateInfo InstanceInfo{};
 
-		InstanceExtensions = GetRequiredInstanceExtentions();
+		InstanceExtensions = GetRequiredInstanceExtensions();
 
 		InstanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		InstanceInfo.pApplicationInfo = &AppInfo;
@@ -172,7 +172,7 @@ namespace KE::RENDERER
 		//Ranges between 0.0 - 1.0
 		float QueuePriority = 1.0f;
 
-		std::vector<const char*> extentions = GetRequiredInstanceExtentions();
+		std::vector<const char*> extentions = GetRequiredInstanceExtensions();
 		QueueFamilyIndices indices = FindQueueFamilies(_VkPhysicalDevice);
 
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
@@ -192,13 +192,15 @@ namespace KE::RENDERER
 
 		VkPhysicalDeviceFeatures DeviceFeaturesInfo{};
 
+		deviceExtensions = GetRequiredDeviceExtensions();
+
 		VkDeviceCreateInfo DeviceInfo{};
 		DeviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 		DeviceInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 		DeviceInfo.pQueueCreateInfos = queueCreateInfos.data();
 		DeviceInfo.pEnabledFeatures = &DeviceFeaturesInfo;
-		DeviceInfo.enabledExtensionCount = 0;
-		DeviceInfo.ppEnabledExtensionNames = VK_NULL_HANDLE;
+		DeviceInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+		DeviceInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
 		if (enableValidationLayers)
 		{
@@ -256,7 +258,7 @@ namespace KE::RENDERER
 		return true;
 	}
 
-	std::vector<const char*> KRender::GetRequiredInstanceExtentions()
+	std::vector<const char*> KRender::GetRequiredInstanceExtensions()
 	{
 		std::vector<const char*> extensions;
 
@@ -280,6 +282,14 @@ namespace KE::RENDERER
 			layers.push_back("VK_LAYER_KHRONOS_validation");
 		}
 		return layers;
+	}
+
+	std::vector<const char*> KRender::GetRequiredDeviceExtensions()
+	{
+		std::vector<const char*> extensions;
+		extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+
+		return extensions;
 	}
 
 	bool KRender::IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice)

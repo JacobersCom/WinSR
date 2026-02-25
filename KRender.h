@@ -56,8 +56,9 @@ namespace KE::RENDERER
 		void CleanUp();
 
 		bool CheckValidationLayerSupport();
-		std::vector<const char*> GetRequiredInstanceExtentions();
+		std::vector<const char*> GetRequiredInstanceExtensions();
 		std::vector<const char*> GetRequiredInstaceLayers();
+		std::vector<const char*> GetRequiredDeviceExtensions();
 		bool IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice);
 
 		//Called from is Device Suitable
