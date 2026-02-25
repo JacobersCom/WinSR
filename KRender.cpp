@@ -47,13 +47,13 @@ namespace KE::RENDERER
 
 		VkInstanceCreateInfo InstanceInfo{};
 
-		auto extentions = GetRequiredInstanceExtentions();
+		InstanceExtensions = GetRequiredInstanceExtentions();
 
 		InstanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		InstanceInfo.pApplicationInfo = &AppInfo;
 		InstanceInfo.pNext = VK_NULL_HANDLE;
-		InstanceInfo.enabledExtensionCount = static_cast<uint32_t>(extentions.size());
-		InstanceInfo.ppEnabledExtensionNames = extentions.data();
+		InstanceInfo.enabledExtensionCount = static_cast<uint32_t>(InstanceExtensions.size());
+		InstanceInfo.ppEnabledExtensionNames = InstanceExtensions.data();
 
 		if (enableValidationLayers && !CheckValidationLayerSupport())
 		{
@@ -65,8 +65,12 @@ namespace KE::RENDERER
 			InstanceInfo.ppEnabledLayerNames = validationLayers.data();
 		}
 
-
-		vkCreateInstance(&InstanceInfo, nullptr, &_VkInstance);
+		VkResult result = vkCreateInstance(&InstanceInfo, nullptr, &_VkInstance);
+		
+		if (vkCreateInstance(&InstanceInfo, nullptr, &_VkInstance) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to create VkInstance");
+		}
 
 		return KE::KReturn::K_SUCCESS;
 	}
@@ -80,10 +84,7 @@ namespace KE::RENDERER
 		_WinSurfaceInfo.hwnd = _win.GetWindowHandle();
 		_WinSurfaceInfo.hinstance = _win.GetWindowInstance();
 
-
-		VkResult result = vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &_VkSurface);
-
-		if (result != VK_SUCCESS)
+		if (vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &_VkSurfaceKHR) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Win32 Surface creation failed");
 		}
@@ -257,18 +258,17 @@ namespace KE::RENDERER
 
 	std::vector<const char*> KRender::GetRequiredInstanceExtentions()
 	{
-		std::vector<const char*> extentions;
+		std::vector<const char*> extensions;
 
 		if (enableValidationLayers)
 		{
-			extentions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+			extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 		}
 
-		extentions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
-		extentions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
-		extentions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+		extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+		extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 
-		return extentions;
+		return extensions;
 	}
 
 	std::vector<const char*> KRender::GetRequiredInstaceLayers()
@@ -286,6 +286,24 @@ namespace KE::RENDERER
 	{
 		QueueFamilyIndices Indices = KRender::FindQueueFamilies(_VkPhyscialDevice);
 
-		return Indices.isComplete();
+		return Indices.isComplete() && CheckDeviceExtensionSupport(_VkPhyscialDevice);
+	}
+
+	bool KRender::CheckDeviceExtensionSupport(VkPhysicalDevice _VkPhysicalDevice)
+	{
+		uint32_t extensionCount;
+
+		vkEnumerateDeviceExtensionProperties(_VkPhysicalDevice, nullptr, &extensionCount, nullptr);
+
+		std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+		vkEnumerateDeviceExtensionProperties(_VkPhysicalDevice, nullptr, &extensionCount, availableExtensions.data());
+
+		std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+
+		for (const auto& extension : availableExtensions)
+		{
+			requiredExtensions.erase(extension.extensionName);
+		}
+		return requiredExtensions.empty();
 	}
 }

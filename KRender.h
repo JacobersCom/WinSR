@@ -60,6 +60,9 @@ namespace KE::RENDERER
 		std::vector<const char*> GetRequiredInstaceLayers();
 		bool IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice);
 
+		//Called from is Device Suitable
+		bool CheckDeviceExtensionSupport(VkPhysicalDevice _VkPhysicalDevice);
+
 	private:
 
 		KE::SYSTEM::KWindow& _win;
@@ -71,5 +74,7 @@ namespace KE::RENDERER
 		VkPhysicalDevice _VkPhyscialDevice;
 
 		std::vector<const char*> validationLayers;
+		std::vector<const char*> InstanceExtensions;
+		std::vector<const char*> deviceExtensions;
 	};
 }
