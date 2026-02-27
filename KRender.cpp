@@ -287,7 +287,7 @@ namespace KE::RENDERER
 	std::vector<const char*> KRender::GetRequiredDeviceExtensions()
 	{
 		std::vector<const char*> extensions;
-		extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+		extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
 		return extensions;
 	}
