@@ -32,6 +32,13 @@ namespace KE::RENDERER
 		}
 	};
 
+	struct SwapChainSupportDetails
+	{
+		VkSurfaceCapabilitiesKHR SurfaceCapabilities;
+		std::vector<VkSurfaceFormatKHR> ImageFormats;
+		std::vector<VkPresentModeKHR> PresentMode;
+	};
+
 	class KRender
 	{
 	public:
@@ -49,16 +56,22 @@ namespace KE::RENDERER
 		KE::KReturn CreateWin32Surface(KE::SYSTEM::KWindow& _win, VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
 		KE::RENDERER::QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
 		KE::RENDERER::QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
+		KE::RENDERER::SwapChainSupportDetails GetSwapChainDetails();
 		KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice);
 		KE::KReturn InitVulkan();
 		
 		void UpdateLoop();
 		void CleanUp();
 
-		std::vector<const char*> GetRequiredInstanceExtentions();
+		bool CheckValidationLayerSupport();
+		std::vector<const char*> GetRequiredInstanceExtensions();
 		std::vector<const char*> GetRequiredInstaceLayers();
+		std::vector<const char*> GetRequiredDeviceExtensions();
 		bool IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice);
 		
+
+		//Called from is Device Suitable
+		bool CheckDeviceExtensionSupport(VkPhysicalDevice _VkPhysicalDevice);
 
 	private:
 
@@ -71,6 +84,7 @@ namespace KE::RENDERER
 		VkPhysicalDevice _VkPhyscialDevice;
 
 		std::vector<const char*> validationLayers;
+		std::vector<const char*> InstanceExtensions;
 		std::vector<const char*> deviceExtensions;
 	};
 }

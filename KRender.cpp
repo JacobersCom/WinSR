@@ -47,13 +47,13 @@ namespace KE::RENDERER
 
 		VkInstanceCreateInfo InstanceInfo{};
 
-		deviceExtensions = GetRequiredInstanceExtentions();
+		InstanceExtensions = GetRequiredInstanceExtensions();
 
 		InstanceInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		InstanceInfo.pApplicationInfo = &AppInfo;
 		InstanceInfo.pNext = VK_NULL_HANDLE;
-		InstanceInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
-		InstanceInfo.ppEnabledExtensionNames = deviceExtensions.data();
+		InstanceInfo.enabledExtensionCount = static_cast<uint32_t>(InstanceExtensions.size());
+		InstanceInfo.ppEnabledExtensionNames = InstanceExtensions.data();
 
 		if (enableValidationLayers)
 		{
@@ -65,7 +65,12 @@ namespace KE::RENDERER
 			InstanceInfo.ppEnabledLayerNames = validationLayers.data();
 		}
 
-		vkCreateInstance(&InstanceInfo, nullptr, &_VkInstance);
+		VkResult result = vkCreateInstance(&InstanceInfo, nullptr, &_VkInstance);
+		
+		if (vkCreateInstance(&InstanceInfo, nullptr, &_VkInstance) != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to create VkInstance");
+		}
 
 		return KE::KReturn::K_SUCCESS;
 	}
@@ -79,10 +84,7 @@ namespace KE::RENDERER
 		_WinSurfaceInfo.hwnd = _win.GetWindowHandle();
 		_WinSurfaceInfo.hinstance = _win.GetWindowInstance();
 
-
-		VkResult result = vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &_VkSurface);
-
-		if (result != VK_SUCCESS)
+		if (vkCreateWin32SurfaceKHR(_VkInstance, &_WinSurfaceInfo, nullptr, &_VkSurfaceKHR) != VK_SUCCESS)
 		{
 			throw std::runtime_error("Win32 Surface creation failed");
 		}
@@ -161,8 +163,38 @@ namespace KE::RENDERER
 
 	KE::RENDERER::QueueFamilyIndices KRender::GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice)
 	{
-		QueueFamilyIndices indices;
+		QueueFamilyIndices indices = FindQueueFamilies(_VkPhysicalDevice);
 		return indices;
+	}
+
+	KE::RENDERER::SwapChainSupportDetails KRender::GetSwapChainDetails()
+	{
+		SwapChainSupportDetails SwapChainDetails;
+
+		//Surface Capabilities
+		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_VkPhyscialDevice, _VkSurface, &SwapChainDetails.SurfaceCapabilities);
+
+		//Format count
+		uint32_t formatCount;
+		vkGetPhysicalDeviceSurfaceFormatsKHR(_VkPhyscialDevice, _VkSurface, &formatCount, nullptr);
+
+		if (formatCount != 0)
+		{
+			SwapChainDetails.ImageFormats.resize(formatCount);
+			vkGetPhysicalDeviceSurfaceFormatsKHR(_VkPhyscialDevice, _VkSurface, &formatCount, SwapChainDetails.ImageFormats.data());
+		}
+
+		//Presentation modes
+		uint32_t presentCount;
+		vkGetPhysicalDeviceSurfacePresentModesKHR(_VkPhyscialDevice, _VkSurface, &presentCount, nullptr);
+
+		if (presentCount != 0)
+		{
+			SwapChainDetails.PresentMode.resize(presentCount);
+			vkGetPhysicalDeviceSurfacePresentModesKHR(_VkPhyscialDevice, _VkSurface, &presentCount, SwapChainDetails.PresentMode.data());
+		}
+
+		return SwapChainDetails;
 	}
 
 	KE::KReturn KE::RENDERER::KRender::CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice)
@@ -170,8 +202,8 @@ namespace KE::RENDERER
 		//Ranges between 0.0 - 1.0
 		float QueuePriority = 1.0f;
 
-		std::vector<const char*> extentions = GetRequiredInstanceExtentions();
-		QueueFamilyIndices indices = FindQueueFamilies(_VkPhysicalDevice);
+		std::vector<const char*> extentions = GetRequiredInstanceExtensions();
+		QueueFamilyIndices indices = GetQueueFamilyIndices(_VkPhysicalDevice);
 
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 		std::set<uint32_t> uniqueQueueFamilies = { indices.GraphicsFamily.value(), indices.PresentFamily.value() };
@@ -190,13 +222,15 @@ namespace KE::RENDERER
 
 		VkPhysicalDeviceFeatures DeviceFeaturesInfo{};
 
+		deviceExtensions = GetRequiredDeviceExtensions();
+
 		VkDeviceCreateInfo DeviceInfo{};
 		DeviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 		DeviceInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 		DeviceInfo.pQueueCreateInfos = queueCreateInfos.data();
 		DeviceInfo.pEnabledFeatures = &DeviceFeaturesInfo;
-		DeviceInfo.enabledExtensionCount = 0;
-		DeviceInfo.ppEnabledExtensionNames = VK_NULL_HANDLE;
+		DeviceInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+		DeviceInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
 		if (enableValidationLayers)
 		{
@@ -233,22 +267,19 @@ namespace KE::RENDERER
 		return Indices.isComplete();
 	}
 
-	
-
-	std::vector<const char*> KRender::GetRequiredInstanceExtentions()
+	std::vector<const char*> KRender::GetRequiredInstanceExtensions()
 	{
-		std::vector<const char*> extentions;
+		std::vector<const char*> extensions;
 
 		if (enableValidationLayers)
 		{
-			extentions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+			extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 		}
 
-		extentions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
-		extentions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
-		extentions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+		extensions.push_back(VK_KHR_SURFACE_EXTENSION_NAME);
+		extensions.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 
-		return extentions;
+		return extensions;
 	}
 
 	std::vector<const char*> KRender::GetRequiredInstaceLayers()
@@ -262,4 +293,46 @@ namespace KE::RENDERER
 		return layers;
 	}
 
+	std::vector<const char*> KRender::GetRequiredDeviceExtensions()
+	{
+		std::vector<const char*> extensions;
+		extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+
+		return extensions;
+	}
+
+	bool KRender::IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice)
+	{
+		QueueFamilyIndices Indices = KRender::FindQueueFamilies(_VkPhyscialDevice);
+
+		bool extensionsSupported = CheckDeviceExtensionSupport(_VkPhyscialDevice);
+
+		//Is the SwapChain supported
+		bool SwapChainAdequate = false;
+		if (extensionsSupported)
+		{
+			SwapChainSupportDetails SwapChainSupportDetails = GetSwapChainDetails();
+			SwapChainAdequate = !SwapChainSupportDetails.ImageFormats.empty() && SwapChainSupportDetails.PresentMode.empty();
+		}
+
+		return Indices.isComplete() && SwapChainAdequate && extensionsSupported;
+	}
+
+	bool KRender::CheckDeviceExtensionSupport(VkPhysicalDevice _VkPhysicalDevice)
+	{
+		uint32_t extensionCount;
+
+		vkEnumerateDeviceExtensionProperties(_VkPhysicalDevice, nullptr, &extensionCount, nullptr);
+
+		std::vector<VkExtensionProperties> availableExtensions(extensionCount);
+		vkEnumerateDeviceExtensionProperties(_VkPhysicalDevice, nullptr, &extensionCount, availableExtensions.data());
+
+		std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+
+		for (const auto& extension : availableExtensions)
+		{
+			requiredExtensions.erase(extension.extensionName);
+		}
+		return requiredExtensions.empty();
+	}
 }

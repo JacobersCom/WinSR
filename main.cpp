@@ -1,7 +1,9 @@
 
 #include "KWindow.h"
 #include "KRender.h"
+#include "KVector3.h"
 
+#include <iostream>
 
 int main()
 {
@@ -13,5 +15,5 @@ int main()
 	_render.run();
 	_win.EventDispatcher();
 
-
+	
 }

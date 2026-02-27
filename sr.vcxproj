@@ -150,6 +150,7 @@
   <ItemGroup>
     <ClInclude Include="KRender.h" />
     <ClInclude Include="KReturn.h" />
+    <ClInclude Include="KVector3.h" />
     <ClInclude Include="KWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
