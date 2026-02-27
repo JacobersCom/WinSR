@@ -230,6 +230,19 @@ namespace KE::RENDERER
 		else 
 		{
 			int width, height;
+			_win.GetFrameBufferSize(_win.GetWindowHandle(), width, height);
+
+			VkExtent2D actualExtent =
+			{
+				static_cast<uint32_t>(width),
+				static_cast<uint32_t>(height)
+
+			};
+
+			actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
+			actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+
+			return actualExtent;
 
 		}
 	}
@@ -291,6 +304,37 @@ namespace KE::RENDERER
 
 
 		return KE::KReturn::K_LOGICAL_DEVICE_CREATION_SUCCESS;
+	}
+
+	KE::KReturn KRender::CreateSwapChain()
+	{
+		SwapChainSupportDetails SwapChainDetails = GetSwapChainDetails();
+
+		VkSurfaceFormatKHR SurfaceFormat = ChooseSwapChainFormat(SwapChainDetails.ImageFormats);
+		VkPresentModeKHR PresentMode = ChooseSwapChainPresentMode(SwapChainDetails.PresentMode);
+		VkExtent2D Extent = ChooseSwapExtent(SwapChainDetails.SurfaceCapabilities);
+		
+		uint32_t ImageCount = SwapChainDetails.SurfaceCapabilities.minImageCount + 1;
+
+		if (SwapChainDetails.SurfaceCapabilities.minImageCount > 0 && ImageCount > SwapChainDetails.SurfaceCapabilities.maxImageCount)
+		{
+			ImageCount = SwapChainDetails.SurfaceCapabilities.maxImageCount;
+		}
+
+		VkSwapchainCreateInfoKHR SwapChainInfo{};
+		SwapChainInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+		SwapChainInfo.surface = _VkSurface;
+		SwapChainInfo.minImageCount = ImageCount;
+		SwapChainInfo.imageFormat = SurfaceFormat.format;
+		SwapChainInfo.imageColorSpace = SurfaceFormat.colorSpace;
+		SwapChainInfo.imageExtent = Extent;
+		SwapChainInfo.imageArrayLayers = 1;
+		SwapChainInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+		QueueFamilyIndices Indices = FindQueueFamilies(_VkPhyscialDevice);
+		uint32_t queueFamilyIndices[] = { Indices.GraphicsFamily.value(), Indices.PresentFamily.value() };
+
+		return KE::KReturn::K_SUCCESS;
 	}
 	
 	bool KRender::CheckValidationLayerSupport()

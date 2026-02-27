@@ -62,10 +62,13 @@ namespace KE::RENDERER
 		KE::KReturn PickPhysicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance);
 		KE::KReturn CreateWin32Surface(KE::SYSTEM::KWindow& _win, VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
 		KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice);
+		KE::KReturn CreateSwapChain();
 		KE::RENDERER::QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
 		KE::RENDERER::QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
-		KE::RENDERER::SwapChainSupportDetails GetSwapChainDetails();
 		
+
+		//All SwapChain helpers
+		KE::RENDERER::SwapChainSupportDetails GetSwapChainDetails();
 		VkSurfaceFormatKHR ChooseSwapChainFormat(const std::vector<VkSurfaceFormatKHR> formats);
 		VkPresentModeKHR ChooseSwapChainPresentMode(const std::vector<VkPresentModeKHR>& presentModes);
 		VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR capabilities);
