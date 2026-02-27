@@ -197,6 +197,43 @@ namespace KE::RENDERER
 		return SwapChainDetails;
 	}
 
+	VkSurfaceFormatKHR KRender::ChooseSwapChainFormat(const std::vector<VkSurfaceFormatKHR> formats)
+	{
+		for (const auto availableFormat : formats)
+		{
+			if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB //the format encoding
+				&& availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) // applys support for images in SRGB color space
+			{
+				return availableFormat;
+			}
+
+			return formats[0];
+		}
+	}
+
+	VkPresentModeKHR KRender::ChooseSwapChainPresentMode(const std::vector<VkPresentModeKHR>& presentModes)
+	{
+		for (const auto& availablePresentMode : presentModes)
+		{
+			if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
+				return availablePresentMode;
+		}
+		return VK_PRESENT_MODE_FIFO_KHR;
+	}
+
+	VkExtent2D KRender::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR capabilities)
+	{
+		if (capabilities.currentExtent.width != UINT32_MAX)
+		{
+			return capabilities.currentExtent;
+		}
+		else 
+		{
+			int width, height;
+
+		}
+	}
+
 	KE::KReturn KE::RENDERER::KRender::CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice)
 	{
 		//Ranges between 0.0 - 1.0
