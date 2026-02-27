@@ -163,8 +163,38 @@ namespace KE::RENDERER
 
 	KE::RENDERER::QueueFamilyIndices KRender::GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice)
 	{
-		QueueFamilyIndices indices;
+		QueueFamilyIndices indices = FindQueueFamilies(_VkPhysicalDevice);
 		return indices;
+	}
+
+	KE::RENDERER::SwapChainSupportDetails KRender::GetSwapChainDetails()
+	{
+		SwapChainSupportDetails SwapChainDetails;
+
+		//Surface Capabilities
+		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_VkPhyscialDevice, _VkSurface, &SwapChainDetails.SurfaceCapabilities);
+
+		//Format count
+		uint32_t formatCount;
+		vkGetPhysicalDeviceSurfaceFormatsKHR(_VkPhyscialDevice, _VkSurface, &formatCount, nullptr);
+
+		if (formatCount != 0)
+		{
+			SwapChainDetails.ImageFormats.resize(formatCount);
+			vkGetPhysicalDeviceSurfaceFormatsKHR(_VkPhyscialDevice, _VkSurface, &formatCount, SwapChainDetails.ImageFormats.data());
+		}
+
+		//Presentation modes
+		uint32_t presentCount;
+		vkGetPhysicalDeviceSurfacePresentModesKHR(_VkPhyscialDevice, _VkSurface, &presentCount, nullptr);
+
+		if (presentCount != 0)
+		{
+			SwapChainDetails.PresentMode.resize(presentCount);
+			vkGetPhysicalDeviceSurfacePresentModesKHR(_VkPhyscialDevice, _VkSurface, &presentCount, SwapChainDetails.PresentMode.data());
+		}
+
+		return SwapChainDetails;
 	}
 
 	KE::KReturn KE::RENDERER::KRender::CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice)
@@ -173,7 +203,7 @@ namespace KE::RENDERER
 		float QueuePriority = 1.0f;
 
 		std::vector<const char*> extentions = GetRequiredInstanceExtensions();
-		QueueFamilyIndices indices = FindQueueFamilies(_VkPhysicalDevice);
+		QueueFamilyIndices indices = GetQueueFamilyIndices(_VkPhysicalDevice);
 
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 		std::set<uint32_t> uniqueQueueFamilies = { indices.GraphicsFamily.value(), indices.PresentFamily.value() };
@@ -296,7 +326,17 @@ namespace KE::RENDERER
 	{
 		QueueFamilyIndices Indices = KRender::FindQueueFamilies(_VkPhyscialDevice);
 
-		return Indices.isComplete() && CheckDeviceExtensionSupport(_VkPhyscialDevice);
+		bool extensionsSupported = CheckDeviceExtensionSupport(_VkPhyscialDevice);
+
+		//Is the SwapChain supported
+		bool SwapChainAdequate = false;
+		if (extensionsSupported)
+		{
+			SwapChainSupportDetails SwapChainSupportDetails = GetSwapChainDetails();
+			SwapChainAdequate = !SwapChainSupportDetails.ImageFormats.empty() && SwapChainSupportDetails.PresentMode.empty();
+		}
+
+		return Indices.isComplete() && SwapChainAdequate && extensionsSupported;
 	}
 
 	bool KRender::CheckDeviceExtensionSupport(VkPhysicalDevice _VkPhysicalDevice)

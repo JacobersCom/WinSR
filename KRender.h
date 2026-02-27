@@ -32,6 +32,13 @@ namespace KE::RENDERER
 		}
 	};
 
+	struct SwapChainSupportDetails
+	{
+		VkSurfaceCapabilitiesKHR SurfaceCapabilities;
+		std::vector<VkSurfaceFormatKHR> ImageFormats;
+		std::vector<VkPresentModeKHR> PresentMode;
+	};
+
 	class KRender
 	{
 	public:
@@ -49,6 +56,7 @@ namespace KE::RENDERER
 		KE::KReturn CreateWin32Surface(KE::SYSTEM::KWindow& _win, VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
 		KE::RENDERER::QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
 		KE::RENDERER::QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
+		KE::RENDERER::SwapChainSupportDetails GetSwapChainDetails();
 		KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice);
 		KE::KReturn InitVulkan();
 		
