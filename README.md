@@ -1,7 +1,7 @@
-# WinSR
+# KOS Engine
 
-### What is WinSR
-- WinSR is a software renderer that uses the windowAPI for windowing and creating a bitmap.
+### Why make a game engine?
+- I found I do not like working within a box such as unreal engine and unity. There are others out there with more controll given to the users but whats the fun in that? Its like a little tease to what you could have. So I wanted to make a game engine. I also like hurting myself and this is safe.
 
 ### Goal
-- I wanted to challegan myself by learning the windowsAPI and more graphics theory.
+- Create a Vulkan game engine that uses the Windows API and supports apple and liunx
