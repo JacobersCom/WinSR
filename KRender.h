@@ -63,7 +63,7 @@ namespace KE::RENDERER
 		KE::KReturn CreateWin32Surface(KE::SYSTEM::KWindow& _win, VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
 		KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice);
 		KE::KReturn CreateSwapChain(VkPhysicalDevice _VkPhysicalDevice, VkDevice _VkDevice, VkSwapchainKHR& _VkSwapChain);
-		KE::KReturn CreateImageViews();
+		KE::KReturn CreateImageViews(VkDevice _VkDevice);
 		KE::RENDERER::QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
 		KE::RENDERER::QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
 		
@@ -98,7 +98,7 @@ namespace KE::RENDERER
 		std::vector<const char*> validationLayers;
 		std::vector<const char*> InstanceExtensions;
 		std::vector<const char*> deviceExtensions;
-		std::vector<VkImage> swapChainImages;
+		std::vector<VkImage> SwapChainImages;
 		std::vector<VkImageView> ImageViews;
 	};
 }

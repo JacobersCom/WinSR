@@ -31,6 +31,10 @@ namespace KE::RENDERER
 
 		vkDestroySurfaceKHR(_VkInstance, _VkSurface, nullptr);
 		vkDestroySwapchainKHR(_VkDevice, _VkSwapChain, nullptr);
+		for (auto& ImageView : ImageViews)
+		{
+			vkDestroyImageView(_VkDevice, ImageView, nullptr);
+		}
 		vkDestroyDevice(_VkDevice, nullptr);
 	}
 
@@ -365,8 +369,8 @@ namespace KE::RENDERER
 		}
 
 		vkGetSwapchainImagesKHR(_VkDevice, _VkSwapChain, &ImageCount, nullptr);
-		swapChainImages.resize(ImageCount);
-		vkGetSwapchainImagesKHR(_VkDevice, _VkSwapChain, &ImageCount, swapChainImages.data());
+		SwapChainImages.resize(ImageCount);
+		vkGetSwapchainImagesKHR(_VkDevice, _VkSwapChain, &ImageCount, SwapChainImages.data());
 
 		_VkSwapChainFormat = SurfaceFormat.format;
 		_VkSwapChainExtent = Extent;
@@ -374,9 +378,36 @@ namespace KE::RENDERER
 		return KE::KReturn::K_SUCCESS;
 	}
 
-	KE::KReturn KRender::CreateImageViews()
+	KE::KReturn KRender::CreateImageViews(VkDevice _VkDevice)
 	{
-		ImageViews.resize(swapChainImages.size());
+		ImageViews.resize(SwapChainImages.size());
+		
+		for (int i = 0; i < SwapChainImages.size(); i++)
+		{
+			VkImageViewCreateInfo ImageViewInfo{};
+			ImageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+			ImageViewInfo.image = SwapChainImages[i];
+			ImageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+			ImageViewInfo.format = _VkSwapChainFormat;
+			ImageViewInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+			ImageViewInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+			ImageViewInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+			ImageViewInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+			
+			ImageViewInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+			ImageViewInfo.subresourceRange.baseMipLevel = 0;
+			ImageViewInfo.subresourceRange.levelCount = 1;
+			ImageViewInfo.subresourceRange.baseArrayLayer = 0;
+			ImageViewInfo.subresourceRange.layerCount = 1;
+
+			VkResult result = vkCreateImageView(_VkDevice, &ImageViewInfo, nullptr, &ImageViews[i]);
+
+			if (result != VK_SUCCESS)
+			{
+				throw std::runtime_error("Failed to create image views for swapchain");
+				return KE::KReturn::K_FAILURE;
+			}
+		}
 		return KE::KReturn::K_SUCCESS;
 	}
 	
