@@ -364,6 +364,19 @@ namespace KE::RENDERER
 			return KE::KReturn::K_FAILURE;
 		}
 
+		vkGetSwapchainImagesKHR(_VkDevice, _VkSwapChain, &ImageCount, nullptr);
+		swapChainImages.resize(ImageCount);
+		vkGetSwapchainImagesKHR(_VkDevice, _VkSwapChain, &ImageCount, swapChainImages.data());
+
+		_VkSwapChainFormat = SurfaceFormat.format;
+		_VkSwapChainExtent = Extent;
+
+		return KE::KReturn::K_SUCCESS;
+	}
+
+	KE::KReturn KRender::CreateImageViews()
+	{
+		ImageViews.resize(swapChainImages.size());
 		return KE::KReturn::K_SUCCESS;
 	}
 	

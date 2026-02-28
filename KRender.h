@@ -63,6 +63,7 @@ namespace KE::RENDERER
 		KE::KReturn CreateWin32Surface(KE::SYSTEM::KWindow& _win, VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
 		KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice);
 		KE::KReturn CreateSwapChain(VkPhysicalDevice _VkPhysicalDevice, VkDevice _VkDevice, VkSwapchainKHR& _VkSwapChain);
+		KE::KReturn CreateImageViews();
 		KE::RENDERER::QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
 		KE::RENDERER::QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
 		
@@ -73,7 +74,6 @@ namespace KE::RENDERER
 		VkPresentModeKHR ChooseSwapChainPresentMode(const std::vector<VkPresentModeKHR>& presentModes);
 		VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR capabilities);
 
-		bool CheckValidationLayerSupport();
 		bool IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice);
 		std::vector<const char*> GetRequiredInstanceExtensions();
 		std::vector<const char*> GetRequiredInstaceLayers();
@@ -92,9 +92,13 @@ namespace KE::RENDERER
 		VkSurfaceKHR _VkSurface;
 		VkPhysicalDevice _VkPhysicalDevice;
 		VkSwapchainKHR _VkSwapChain;
+		VkFormat _VkSwapChainFormat;
+		VkExtent2D _VkSwapChainExtent;
 
 		std::vector<const char*> validationLayers;
 		std::vector<const char*> InstanceExtensions;
 		std::vector<const char*> deviceExtensions;
+		std::vector<VkImage> swapChainImages;
+		std::vector<VkImageView> ImageViews;
 	};
 }
