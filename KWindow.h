@@ -24,6 +24,7 @@ namespace KE::SYSTEM
 		void Create();
 		void SetWindowDesc(const WCHAR* WindowClassName, const WCHAR* WindowTitle,
 			const int WindowWidth, const int WindowHeight);
+		void GetFrameBufferSize(HWND WindowHandle, int& Width, int& Height);
 		KReturn EventDispatcher();
 
 		const HWND GetWindowHandle() { return WindowHandle; }

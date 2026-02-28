@@ -3,6 +3,8 @@
 #define VK_USE_PLATFORM_WIN32_KHR
 
 #include <iostream>
+#include <cstdint>
+#include <algorithm>
 #include <vector>
 #include <optional>
 #include <set>
@@ -51,24 +53,31 @@ namespace KE::RENDERER
 		
 	private:
 
-		KE::KReturn CreateVkInstance(VkInstance& _Instance);
-		KE::KReturn PickPhysicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance);
-		KE::KReturn CreateWin32Surface(KE::SYSTEM::KWindow& _win, VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
-		KE::RENDERER::QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
-		KE::RENDERER::QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
-		KE::RENDERER::SwapChainSupportDetails GetSwapChainDetails();
-		KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice);
 		KE::KReturn InitVulkan();
 		
 		void UpdateLoop();
 		void CleanUp();
+		
+		KE::KReturn CreateVkInstance(VkInstance& _Instance);
+		KE::KReturn PickPhysicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance);
+		KE::KReturn CreateWin32Surface(KE::SYSTEM::KWindow& _win, VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
+		KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice);
+		KE::KReturn CreateSwapChain(VkPhysicalDevice _VkPhysicalDevice, VkDevice _VkDevice, VkSwapchainKHR& _VkSwapChain);
+		KE::RENDERER::QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
+		KE::RENDERER::QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
+		
+
+		//All SwapChain helpers
+		KE::RENDERER::SwapChainSupportDetails GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice);
+		VkSurfaceFormatKHR ChooseSwapChainFormat(const std::vector<VkSurfaceFormatKHR> formats);
+		VkPresentModeKHR ChooseSwapChainPresentMode(const std::vector<VkPresentModeKHR>& presentModes);
+		VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR capabilities);
 
 		bool CheckValidationLayerSupport();
+		bool IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice);
 		std::vector<const char*> GetRequiredInstanceExtensions();
 		std::vector<const char*> GetRequiredInstaceLayers();
 		std::vector<const char*> GetRequiredDeviceExtensions();
-		bool IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice);
-		
 
 		//Called from is Device Suitable
 		bool CheckDeviceExtensionSupport(VkPhysicalDevice _VkPhysicalDevice);
@@ -81,7 +90,8 @@ namespace KE::RENDERER
 		VkQueue _VkGraphicsQueue;
 		VkQueue _VkPresentationQueue;
 		VkSurfaceKHR _VkSurface;
-		VkPhysicalDevice _VkPhyscialDevice;
+		VkPhysicalDevice _VkPhysicalDevice;
+		VkSwapchainKHR _VkSwapChain;
 
 		std::vector<const char*> validationLayers;
 		std::vector<const char*> InstanceExtensions;

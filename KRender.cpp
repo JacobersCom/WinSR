@@ -14,8 +14,10 @@ namespace KE::RENDERER
 	{
 		KE::RENDERER::KRender::CreateVkInstance(_VkInstance);
 		KE::RENDERER::KRender::CreateWin32Surface(_win, _VkInstance, _VkSurface);
-		KE::RENDERER::KRender::PickPhysicalDevice(_VkPhyscialDevice, _VkInstance);
-		KE::RENDERER::KRender::CreateLogicalDevice(_VkPhyscialDevice, _VkDevice);
+		KE::RENDERER::KRender::PickPhysicalDevice(_VkPhysicalDevice, _VkInstance);
+		KE::RENDERER::KRender::CreateLogicalDevice(_VkPhysicalDevice, _VkDevice);
+		KE::RENDERER::KRender::CreateSwapChain(_VkPhysicalDevice, _VkDevice, _VkSwapChain);
+
 		return KE::KReturn::K_SUCCESS;
 	}
 
@@ -28,6 +30,7 @@ namespace KE::RENDERER
 	{
 
 		vkDestroySurfaceKHR(_VkInstance, _VkSurface, nullptr);
+		vkDestroySwapchainKHR(_VkDevice, _VkSwapChain, nullptr);
 		vkDestroyDevice(_VkDevice, nullptr);
 	}
 
@@ -104,15 +107,15 @@ namespace KE::RENDERER
 		}
 
 		//Get device information
-		std::vector<VkPhysicalDevice> devices(deviceCount);
-		vkEnumeratePhysicalDevices(_VkInstance, &deviceCount, devices.data());
+		std::vector<VkPhysicalDevice> PhysicalDevices(deviceCount);
+		vkEnumeratePhysicalDevices(_VkInstance, &deviceCount, PhysicalDevices.data());
 
 		//Find a suitable device with vulkan support
-		for (const auto device : devices)
+		for (const auto PhysicalDevice : PhysicalDevices)
 		{
-			if (IsDeviceSuitable(device))
+			if (IsDeviceSuitable(PhysicalDevice))
 			{
-				_VkPhysicalDevice = device;
+				_VkPhysicalDevice = PhysicalDevice;
 				break;
 			}
 		}
@@ -167,34 +170,84 @@ namespace KE::RENDERER
 		return indices;
 	}
 
-	KE::RENDERER::SwapChainSupportDetails KRender::GetSwapChainDetails()
+	KE::RENDERER::SwapChainSupportDetails KRender::GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice)
 	{
 		SwapChainSupportDetails SwapChainDetails;
 
 		//Surface Capabilities
-		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_VkPhyscialDevice, _VkSurface, &SwapChainDetails.SurfaceCapabilities);
+		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_VkPhysicalDevice, _VkSurface, &SwapChainDetails.SurfaceCapabilities);
 
 		//Format count
 		uint32_t formatCount;
-		vkGetPhysicalDeviceSurfaceFormatsKHR(_VkPhyscialDevice, _VkSurface, &formatCount, nullptr);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(_VkPhysicalDevice, _VkSurface, &formatCount, nullptr);
 
 		if (formatCount != 0)
 		{
 			SwapChainDetails.ImageFormats.resize(formatCount);
-			vkGetPhysicalDeviceSurfaceFormatsKHR(_VkPhyscialDevice, _VkSurface, &formatCount, SwapChainDetails.ImageFormats.data());
+			vkGetPhysicalDeviceSurfaceFormatsKHR(_VkPhysicalDevice, _VkSurface, &formatCount, SwapChainDetails.ImageFormats.data());
 		}
 
 		//Presentation modes
 		uint32_t presentCount;
-		vkGetPhysicalDeviceSurfacePresentModesKHR(_VkPhyscialDevice, _VkSurface, &presentCount, nullptr);
+		vkGetPhysicalDeviceSurfacePresentModesKHR(_VkPhysicalDevice, _VkSurface, &presentCount, nullptr);
 
 		if (presentCount != 0)
 		{
 			SwapChainDetails.PresentMode.resize(presentCount);
-			vkGetPhysicalDeviceSurfacePresentModesKHR(_VkPhyscialDevice, _VkSurface, &presentCount, SwapChainDetails.PresentMode.data());
+			vkGetPhysicalDeviceSurfacePresentModesKHR(_VkPhysicalDevice, _VkSurface, &presentCount, SwapChainDetails.PresentMode.data());
 		}
 
 		return SwapChainDetails;
+	}
+
+	VkSurfaceFormatKHR KRender::ChooseSwapChainFormat(const std::vector<VkSurfaceFormatKHR> formats)
+	{
+		for (const auto availableFormat : formats)
+		{
+			if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB //the format encoding
+				&& availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) // applys support for images in SRGB color space
+			{
+				return availableFormat;
+			}
+
+			return formats[0];
+		}
+	}
+
+	VkPresentModeKHR KRender::ChooseSwapChainPresentMode(const std::vector<VkPresentModeKHR>& presentModes)
+	{
+		for (const auto& availablePresentMode : presentModes)
+		{
+			if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
+				return availablePresentMode;
+		}
+		return VK_PRESENT_MODE_FIFO_KHR;
+	}
+
+	VkExtent2D KRender::ChooseSwapExtent(const VkSurfaceCapabilitiesKHR capabilities)
+	{
+		if (capabilities.currentExtent.width != UINT32_MAX)
+		{
+			return capabilities.currentExtent;
+		}
+		else 
+		{
+			int width, height;
+			_win.GetFrameBufferSize(_win.GetWindowHandle(), width, height);
+
+			VkExtent2D actualExtent =
+			{
+				static_cast<uint32_t>(width),
+				static_cast<uint32_t>(height)
+
+			};
+
+			actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
+			actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+
+			return actualExtent;
+
+		}
 	}
 
 	KE::KReturn KE::RENDERER::KRender::CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice)
@@ -255,6 +308,64 @@ namespace KE::RENDERER
 
 		return KE::KReturn::K_LOGICAL_DEVICE_CREATION_SUCCESS;
 	}
+
+	KE::KReturn KRender::CreateSwapChain(VkPhysicalDevice _VkPhysicalDevice, VkDevice _VkDevice, VkSwapchainKHR& _VkSwapChain)
+	{
+		SwapChainSupportDetails SwapChainDetails = GetSwapChainDetails(_VkPhysicalDevice);
+
+		VkSurfaceFormatKHR SurfaceFormat = ChooseSwapChainFormat(SwapChainDetails.ImageFormats);
+		VkPresentModeKHR PresentMode = ChooseSwapChainPresentMode(SwapChainDetails.PresentMode);
+		VkExtent2D Extent = ChooseSwapExtent(SwapChainDetails.SurfaceCapabilities);
+		
+		uint32_t ImageCount = SwapChainDetails.SurfaceCapabilities.minImageCount + 1;
+
+		if (SwapChainDetails.SurfaceCapabilities.minImageCount > 0 && ImageCount > SwapChainDetails.SurfaceCapabilities.maxImageCount)
+		{
+			ImageCount = SwapChainDetails.SurfaceCapabilities.maxImageCount;
+		}
+
+		VkSwapchainCreateInfoKHR SwapChainInfo{};
+		SwapChainInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+		SwapChainInfo.surface = _VkSurface;
+		SwapChainInfo.minImageCount = ImageCount;
+		SwapChainInfo.imageFormat = SurfaceFormat.format;
+		SwapChainInfo.imageColorSpace = SurfaceFormat.colorSpace;
+		SwapChainInfo.imageExtent = Extent;
+		SwapChainInfo.imageArrayLayers = 1;
+		SwapChainInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+		QueueFamilyIndices Indices = FindQueueFamilies(_VkPhysicalDevice);
+		uint32_t queueFamilyIndices[] = { Indices.GraphicsFamily.value(), Indices.PresentFamily.value() };
+
+		if (Indices.GraphicsFamily != Indices.PresentFamily)
+		{
+			SwapChainInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT; // Image can be used by muiltple queues
+			SwapChainInfo.queueFamilyIndexCount = 2;
+			SwapChainInfo.pQueueFamilyIndices = queueFamilyIndices;
+		}
+		else
+		{
+			SwapChainInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE; // Images can only be used by a single queue
+			SwapChainInfo.queueFamilyIndexCount = 0; 
+			SwapChainInfo.pQueueFamilyIndices = nullptr; 
+		}
+
+		SwapChainInfo.preTransform = SwapChainDetails.SurfaceCapabilities.currentTransform;
+		SwapChainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR; // ALPHA should not be used for blending windows
+		SwapChainInfo.presentMode = PresentMode;
+		SwapChainInfo.clipped = VK_TRUE; // Dont care about covered pixels
+		SwapChainInfo.oldSwapchain = VK_NULL_HANDLE;
+		
+		VkResult result = vkCreateSwapchainKHR(_VkDevice, &SwapChainInfo, nullptr, &_VkSwapChain);
+
+		if (result != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to create SwapChain");
+			return KE::KReturn::K_FAILURE;
+		}
+
+		return KE::KReturn::K_SUCCESS;
+	}
 	
 	
 
@@ -311,8 +422,8 @@ namespace KE::RENDERER
 		bool SwapChainAdequate = false;
 		if (extensionsSupported)
 		{
-			SwapChainSupportDetails SwapChainSupportDetails = GetSwapChainDetails();
-			SwapChainAdequate = !SwapChainSupportDetails.ImageFormats.empty() && SwapChainSupportDetails.PresentMode.empty();
+			SwapChainSupportDetails SwapChainSupportDetails = GetSwapChainDetails(_VkPhyscialDevice);
+			SwapChainAdequate = !SwapChainSupportDetails.ImageFormats.empty() && !SwapChainSupportDetails.PresentMode.empty();
 		}
 
 		return Indices.isComplete() && SwapChainAdequate && extensionsSupported;
