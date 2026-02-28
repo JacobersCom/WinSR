@@ -62,13 +62,13 @@ namespace KE::RENDERER
 		KE::KReturn PickPhysicalDevice(VkPhysicalDevice& _VkPhysicalDevice, VkInstance _VkInstance);
 		KE::KReturn CreateWin32Surface(KE::SYSTEM::KWindow& _win, VkInstance _VkInstance, VkSurfaceKHR& _VkSurfaceKHR);
 		KE::KReturn CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice);
-		KE::KReturn CreateSwapChain();
+		KE::KReturn CreateSwapChain(VkPhysicalDevice _VkPhysicalDevice, VkDevice _VkDevice, VkSwapchainKHR& _VkSwapChain);
 		KE::RENDERER::QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
 		KE::RENDERER::QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
 		
 
 		//All SwapChain helpers
-		KE::RENDERER::SwapChainSupportDetails GetSwapChainDetails();
+		KE::RENDERER::SwapChainSupportDetails GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice);
 		VkSurfaceFormatKHR ChooseSwapChainFormat(const std::vector<VkSurfaceFormatKHR> formats);
 		VkPresentModeKHR ChooseSwapChainPresentMode(const std::vector<VkPresentModeKHR>& presentModes);
 		VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR capabilities);
@@ -90,7 +90,8 @@ namespace KE::RENDERER
 		VkQueue _VkGraphicsQueue;
 		VkQueue _VkPresentationQueue;
 		VkSurfaceKHR _VkSurface;
-		VkPhysicalDevice _VkPhyscialDevice;
+		VkPhysicalDevice _VkPhysicalDevice;
+		VkSwapchainKHR _VkSwapChain;
 
 		std::vector<const char*> validationLayers;
 		std::vector<const char*> InstanceExtensions;

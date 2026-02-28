@@ -14,8 +14,10 @@ namespace KE::RENDERER
 	{
 		KE::RENDERER::KRender::CreateVkInstance(_VkInstance);
 		KE::RENDERER::KRender::CreateWin32Surface(_win, _VkInstance, _VkSurface);
-		KE::RENDERER::KRender::PickPhysicalDevice(_VkPhyscialDevice, _VkInstance);
-		KE::RENDERER::KRender::CreateLogicalDevice(_VkPhyscialDevice, _VkDevice);
+		KE::RENDERER::KRender::PickPhysicalDevice(_VkPhysicalDevice, _VkInstance);
+		KE::RENDERER::KRender::CreateLogicalDevice(_VkPhysicalDevice, _VkDevice);
+		KE::RENDERER::KRender::CreateSwapChain(_VkPhysicalDevice, _VkDevice, _VkSwapChain);
+
 		return KE::KReturn::K_SUCCESS;
 	}
 
@@ -28,6 +30,7 @@ namespace KE::RENDERER
 	{
 
 		vkDestroySurfaceKHR(_VkInstance, _VkSurface, nullptr);
+		vkDestroySwapchainKHR(_VkDevice, _VkSwapChain, nullptr);
 		vkDestroyDevice(_VkDevice, nullptr);
 	}
 
@@ -104,15 +107,15 @@ namespace KE::RENDERER
 		}
 
 		//Get device information
-		std::vector<VkPhysicalDevice> devices(deviceCount);
-		vkEnumeratePhysicalDevices(_VkInstance, &deviceCount, devices.data());
+		std::vector<VkPhysicalDevice> PhysicalDevices(deviceCount);
+		vkEnumeratePhysicalDevices(_VkInstance, &deviceCount, PhysicalDevices.data());
 
 		//Find a suitable device with vulkan support
-		for (const auto device : devices)
+		for (const auto PhysicalDevice : PhysicalDevices)
 		{
-			if (IsDeviceSuitable(device))
+			if (IsDeviceSuitable(PhysicalDevice))
 			{
-				_VkPhysicalDevice = device;
+				_VkPhysicalDevice = PhysicalDevice;
 				break;
 			}
 		}
@@ -167,31 +170,31 @@ namespace KE::RENDERER
 		return indices;
 	}
 
-	KE::RENDERER::SwapChainSupportDetails KRender::GetSwapChainDetails()
+	KE::RENDERER::SwapChainSupportDetails KRender::GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice)
 	{
 		SwapChainSupportDetails SwapChainDetails;
 
 		//Surface Capabilities
-		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_VkPhyscialDevice, _VkSurface, &SwapChainDetails.SurfaceCapabilities);
+		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_VkPhysicalDevice, _VkSurface, &SwapChainDetails.SurfaceCapabilities);
 
 		//Format count
 		uint32_t formatCount;
-		vkGetPhysicalDeviceSurfaceFormatsKHR(_VkPhyscialDevice, _VkSurface, &formatCount, nullptr);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(_VkPhysicalDevice, _VkSurface, &formatCount, nullptr);
 
 		if (formatCount != 0)
 		{
 			SwapChainDetails.ImageFormats.resize(formatCount);
-			vkGetPhysicalDeviceSurfaceFormatsKHR(_VkPhyscialDevice, _VkSurface, &formatCount, SwapChainDetails.ImageFormats.data());
+			vkGetPhysicalDeviceSurfaceFormatsKHR(_VkPhysicalDevice, _VkSurface, &formatCount, SwapChainDetails.ImageFormats.data());
 		}
 
 		//Presentation modes
 		uint32_t presentCount;
-		vkGetPhysicalDeviceSurfacePresentModesKHR(_VkPhyscialDevice, _VkSurface, &presentCount, nullptr);
+		vkGetPhysicalDeviceSurfacePresentModesKHR(_VkPhysicalDevice, _VkSurface, &presentCount, nullptr);
 
 		if (presentCount != 0)
 		{
 			SwapChainDetails.PresentMode.resize(presentCount);
-			vkGetPhysicalDeviceSurfacePresentModesKHR(_VkPhyscialDevice, _VkSurface, &presentCount, SwapChainDetails.PresentMode.data());
+			vkGetPhysicalDeviceSurfacePresentModesKHR(_VkPhysicalDevice, _VkSurface, &presentCount, SwapChainDetails.PresentMode.data());
 		}
 
 		return SwapChainDetails;
@@ -306,9 +309,9 @@ namespace KE::RENDERER
 		return KE::KReturn::K_LOGICAL_DEVICE_CREATION_SUCCESS;
 	}
 
-	KE::KReturn KRender::CreateSwapChain()
+	KE::KReturn KRender::CreateSwapChain(VkPhysicalDevice _VkPhysicalDevice, VkDevice _VkDevice, VkSwapchainKHR& _VkSwapChain)
 	{
-		SwapChainSupportDetails SwapChainDetails = GetSwapChainDetails();
+		SwapChainSupportDetails SwapChainDetails = GetSwapChainDetails(_VkPhysicalDevice);
 
 		VkSurfaceFormatKHR SurfaceFormat = ChooseSwapChainFormat(SwapChainDetails.ImageFormats);
 		VkPresentModeKHR PresentMode = ChooseSwapChainPresentMode(SwapChainDetails.PresentMode);
@@ -331,8 +334,35 @@ namespace KE::RENDERER
 		SwapChainInfo.imageArrayLayers = 1;
 		SwapChainInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-		QueueFamilyIndices Indices = FindQueueFamilies(_VkPhyscialDevice);
+		QueueFamilyIndices Indices = FindQueueFamilies(_VkPhysicalDevice);
 		uint32_t queueFamilyIndices[] = { Indices.GraphicsFamily.value(), Indices.PresentFamily.value() };
+
+		if (Indices.GraphicsFamily != Indices.PresentFamily)
+		{
+			SwapChainInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT; // Image can be used by muiltple queues
+			SwapChainInfo.queueFamilyIndexCount = 2;
+			SwapChainInfo.pQueueFamilyIndices = queueFamilyIndices;
+		}
+		else
+		{
+			SwapChainInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE; // Images can only be used by a single queue
+			SwapChainInfo.queueFamilyIndexCount = 0; 
+			SwapChainInfo.pQueueFamilyIndices = nullptr; 
+		}
+
+		SwapChainInfo.preTransform = SwapChainDetails.SurfaceCapabilities.currentTransform;
+		SwapChainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR; // ALPHA should not be used for blending windows
+		SwapChainInfo.presentMode = PresentMode;
+		SwapChainInfo.clipped = VK_TRUE; // Dont care about covered pixels
+		SwapChainInfo.oldSwapchain = VK_NULL_HANDLE;
+		
+		VkResult result = vkCreateSwapchainKHR(_VkDevice, &SwapChainInfo, nullptr, &_VkSwapChain);
+
+		if (result != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to create SwapChain");
+			return KE::KReturn::K_FAILURE;
+		}
 
 		return KE::KReturn::K_SUCCESS;
 	}
@@ -413,8 +443,8 @@ namespace KE::RENDERER
 		bool SwapChainAdequate = false;
 		if (extensionsSupported)
 		{
-			SwapChainSupportDetails SwapChainSupportDetails = GetSwapChainDetails();
-			SwapChainAdequate = !SwapChainSupportDetails.ImageFormats.empty() && SwapChainSupportDetails.PresentMode.empty();
+			SwapChainSupportDetails SwapChainSupportDetails = GetSwapChainDetails(_VkPhyscialDevice);
+			SwapChainAdequate = !SwapChainSupportDetails.ImageFormats.empty() && !SwapChainSupportDetails.PresentMode.empty();
 		}
 
 		return Indices.isComplete() && SwapChainAdequate && extensionsSupported;
