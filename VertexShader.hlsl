@@ -16,5 +16,5 @@ VSout main(uint vertexId : SV_VertexID )
 {
     VSout o;
     o.pos = float4(pos[vertexId], 0.0f, 1.0f);
-    return o
+    return o;
 }
