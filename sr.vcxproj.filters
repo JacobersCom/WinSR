@@ -35,5 +35,11 @@
     <ClInclude Include="KRender.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="KVector3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KMat4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

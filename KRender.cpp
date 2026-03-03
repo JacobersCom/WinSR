@@ -62,7 +62,7 @@ namespace KE::RENDERER
 		InstanceInfo.enabledExtensionCount = static_cast<uint32_t>(InstanceExtensions.size());
 		InstanceInfo.ppEnabledExtensionNames = InstanceExtensions.data();
 
-		if (enableValidationLayers)
+		if (!enableValidationLayers)
 		{
 			throw std::runtime_error("Validation layers requested, but not available");
 		}
@@ -409,17 +409,6 @@ namespace KE::RENDERER
 			}
 		}
 		return KE::KReturn::K_SUCCESS;
-	}
-	
-	
-
-	bool KRender::IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice)
-	{
-		QueueFamilyIndices Indices = KRender::FindQueueFamilies(_VkPhyscialDevice);
-
-		
-
-		return Indices.isComplete();
 	}
 
 	std::vector<const char*> KRender::GetRequiredInstanceExtensions()
