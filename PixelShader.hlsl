@@ -1,12 +1,10 @@
 
 struct PSout
 {
-	float4 color : SV_TARGET;
+	float4 color : COLOR0;
 };
 
-PSout main()
+float4 main(PSout o) : SV_Target0 
 {
-    PSout o;
-    o.color = float4(1.0, 1.0, 1.0, 1.0);
-    return o;
+    return o.color;
 }
