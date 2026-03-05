@@ -65,6 +65,7 @@ namespace KE::RENDERER
 		KE::KReturn CreateSwapChain(VkPhysicalDevice _VkPhysicalDevice, VkDevice _VkDevice, VkSwapchainKHR& _VkSwapChain);
 		KE::KReturn CreateImageViews(VkDevice _VkDevice);
 		KE::KReturn CreatePipeLine();
+		KE::KReturn LoadShaders();
 		KE::RENDERER::QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
 		KE::RENDERER::QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
 		

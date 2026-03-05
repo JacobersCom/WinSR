@@ -132,6 +132,11 @@ namespace KE::RENDERER
 		return KE::KReturn::K_SUCCESS;
 	}
 
+	KE::KReturn KRender::LoadShaders()
+	{
+		return KE::KReturn();
+	}
+
 	KE::RENDERER::QueueFamilyIndices KRender::FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice)
 	{
 		QueueFamilyIndices indices;
