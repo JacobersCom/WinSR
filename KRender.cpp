@@ -254,6 +254,11 @@ namespace KE::RENDERER
 		}
 	}
 
+	VkShaderModule KRender::CreateShaderModule(const std::vector<char>& code)
+	{
+		
+	}
+
 	KE::KReturn KE::RENDERER::KRender::CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice)
 	{
 		//Ranges between 0.0 - 1.0
