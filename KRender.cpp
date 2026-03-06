@@ -411,6 +411,12 @@ namespace KE::RENDERER
 		return KE::KReturn::K_SUCCESS;
 	}
 
+	KE::KReturn KRender::CreatePipeLine()
+	{
+		//auto VertShader = LoadShaders("")
+		//auto PixelShader = LoadShaders()
+	}
+
 	std::vector<const char*> KRender::GetRequiredInstanceExtensions()
 	{
 		std::vector<const char*> extensions;
