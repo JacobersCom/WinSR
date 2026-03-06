@@ -132,11 +132,6 @@ namespace KE::RENDERER
 		return KE::KReturn::K_SUCCESS;
 	}
 
-	KE::KReturn KRender::LoadShaders()
-	{
-		return KE::KReturn();
-	}
-
 	KE::RENDERER::QueueFamilyIndices KRender::FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice)
 	{
 		QueueFamilyIndices indices;
@@ -465,6 +460,29 @@ namespace KE::RENDERER
 		}
 
 		return Indices.isComplete() && SwapChainAdequate && extensionsSupported;
+	}
+
+	std::vector<char> KRender::LoadShaders(const std::string& _FileName)
+	{
+		//Starts reading at the end of the file
+		std::ifstream file(_FileName, std::ios::ate | std::ios::binary);
+
+		if (!file.is_open())
+		{
+			throw std::runtime_error("Failed to load shader files");
+		}
+
+		//Returns the files size in bytes
+		auto fileSize = file.tellg();
+		std::vector<char> buffer(fileSize);
+
+		//Reset the postion pointer to the beginnering of the file
+		file.seekg(0);
+		//Read shader data into vector
+		file.read(buffer.data(), fileSize);
+
+		file.close();
+		return buffer;
 	}
 
 	bool KRender::CheckDeviceExtensionSupport(VkPhysicalDevice _VkPhysicalDevice)

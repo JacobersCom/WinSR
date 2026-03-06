@@ -8,6 +8,7 @@
 #include <vector>
 #include <optional>
 #include <set>
+#include <fstream>
 
 #include "vulkan/vulkan.h"
 #include "KWindow.h"
@@ -65,7 +66,6 @@ namespace KE::RENDERER
 		KE::KReturn CreateSwapChain(VkPhysicalDevice _VkPhysicalDevice, VkDevice _VkDevice, VkSwapchainKHR& _VkSwapChain);
 		KE::KReturn CreateImageViews(VkDevice _VkDevice);
 		KE::KReturn CreatePipeLine();
-		KE::KReturn LoadShaders();
 		KE::RENDERER::QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
 		KE::RENDERER::QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
 		
@@ -77,6 +77,7 @@ namespace KE::RENDERER
 		VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR capabilities);
 
 		bool IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice);
+		std::vector<char> LoadShaders(const std::string& _FileName);
 		std::vector<const char*> GetRequiredInstanceExtensions();
 		std::vector<const char*> GetRequiredInstaceLayers();
 		std::vector<const char*> GetRequiredDeviceExtensions();
