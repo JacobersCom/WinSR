@@ -79,7 +79,7 @@ namespace KE::RENDERER
 		//Takes in the a SPIR compiled shader
 		std::vector<char> LoadShaders(const std::string& _FileName);
 		//Takes in the return from LoadShaders
-		VkShaderModule CreateShaderModule(const std::vector<char>& code);
+		VkShaderModule CreateShaderModule(const std::vector<char>& code, VkShaderModule& _VkShaderModule);
 
 		bool IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice);
 		std::vector<const char*> GetRequiredInstanceExtensions();
@@ -101,6 +101,10 @@ namespace KE::RENDERER
 		VkSwapchainKHR _VkSwapChain;
 		VkFormat _VkSwapChainFormat;
 		VkExtent2D _VkSwapChainExtent;
+
+		VkShaderModule _VertShader;
+		VkShaderModule _FragShader;
+
 
 		std::vector<const char*> validationLayers;
 		std::vector<const char*> InstanceExtensions;
