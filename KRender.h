@@ -81,7 +81,7 @@ namespace KE::RENDERER
 		//Takes in the a spv compiled shader
 		std::vector<char> LoadShaders(const std::string& _FileName);
 		//Takes in the return from LoadShaders
-		VkShaderModule CreateShaderModule(const std::vector<char>& code, VkShaderModule& _VkShaderModule);
+		VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
 		bool IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice);
 		//Called from is Device Suitable

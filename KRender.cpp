@@ -417,8 +417,8 @@ namespace KE::RENDERER
 		auto VertShaderCode = LoadShaders("VertShader.spv");
 		auto PixelShaderCode = LoadShaders("frag.spv");
 		
-		VkShaderModule VertModule = CreateShaderModule(VertShaderCode, VertModule);
-		VkShaderModule PixelModule = CreateShaderModule(PixelShaderCode, PixelModule);
+		VkShaderModule VertModule = CreateShaderModule(VertShaderCode);
+		VkShaderModule PixelModule = CreateShaderModule(PixelShaderCode);
 
 
 		VkPipelineShaderStageCreateInfo VertexStage{};
@@ -532,12 +532,14 @@ namespace KE::RENDERER
 		return requiredExtensions.empty();
 	}
 
-	VkShaderModule KRender::CreateShaderModule(const std::vector<char>& code, VkShaderModule& _VkShaderModule)
+	VkShaderModule KRender::CreateShaderModule(const std::vector<char>& code)
 	{
 		VkShaderModuleCreateInfo ShaderModuleCreateInfo{};
 		ShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 		ShaderModuleCreateInfo.codeSize = code.size();
 		ShaderModuleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+
+		VkShaderModule _VkShaderModule;
 
 		VkResult result = vkCreateShaderModule(_VkDevice, &ShaderModuleCreateInfo, nullptr, &_VkShaderModule);
 		if (result != VK_SUCCESS)
