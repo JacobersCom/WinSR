@@ -76,18 +76,20 @@ namespace KE::RENDERER
 		VkPresentModeKHR ChooseSwapChainPresentMode(const std::vector<VkPresentModeKHR>& presentModes);
 		VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR capabilities);
 
-		//Takes in the a SPIR compiled shader
+
+		//All Shader helpers
+		//Takes in the a spv compiled shader
 		std::vector<char> LoadShaders(const std::string& _FileName);
 		//Takes in the return from LoadShaders
 		VkShaderModule CreateShaderModule(const std::vector<char>& code, VkShaderModule& _VkShaderModule);
 
 		bool IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice);
+		//Called from is Device Suitable
+		bool CheckDeviceExtensionSupport(VkPhysicalDevice _VkPhysicalDevice);
 		std::vector<const char*> GetRequiredInstanceExtensions();
 		std::vector<const char*> GetRequiredInstaceLayers();
 		std::vector<const char*> GetRequiredDeviceExtensions();
 
-		//Called from is Device Suitable
-		bool CheckDeviceExtensionSupport(VkPhysicalDevice _VkPhysicalDevice);
 
 	private:
 
@@ -101,10 +103,6 @@ namespace KE::RENDERER
 		VkSwapchainKHR _VkSwapChain;
 		VkFormat _VkSwapChainFormat;
 		VkExtent2D _VkSwapChainExtent;
-
-		VkShaderModule _VertShader;
-		VkShaderModule _FragShader;
-
 
 		std::vector<const char*> validationLayers;
 		std::vector<const char*> InstanceExtensions;

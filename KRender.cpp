@@ -254,21 +254,6 @@ namespace KE::RENDERER
 		}
 	}
 
-	VkShaderModule KRender::CreateShaderModule(const std::vector<char>& code, VkShaderModule& _VkShaderModule)
-	{
-		VkShaderModuleCreateInfo ShaderModuleCreateInfo{};
-		ShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-		ShaderModuleCreateInfo.codeSize = code.size();
-		ShaderModuleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
-
-		VkResult result = vkCreateShaderModule(_VkDevice, &ShaderModuleCreateInfo, nullptr, &_VkShaderModule);
-		if (result != VK_SUCCESS)
-		{
-			throw std::runtime_error("Failed to create Shader Module");
-		}
-
-		return _VkShaderModule;
-	}
 
 	KE::KReturn KE::RENDERER::KRender::CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice)
 	{
@@ -448,7 +433,7 @@ namespace KE::RENDERER
 		VertexStage.module = PixelModule;
 		VertexStage.pName = "main";
 
-		VkPipelineShaderStageCreateInfo ShaderStages[] = {VertexStage, PixelStage}
+		VkPipelineShaderStageCreateInfo ShaderStages[] = { VertexStage, PixelStage };
 		//Clean up
 		vkDestroyShaderModule(_VkDevice, VertModule, nullptr);
 		vkDestroyShaderModule(_VkDevice, PixelModule, nullptr);
@@ -545,5 +530,21 @@ namespace KE::RENDERER
 			requiredExtensions.erase(extension.extensionName);
 		}
 		return requiredExtensions.empty();
+	}
+
+	VkShaderModule KRender::CreateShaderModule(const std::vector<char>& code, VkShaderModule& _VkShaderModule)
+	{
+		VkShaderModuleCreateInfo ShaderModuleCreateInfo{};
+		ShaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+		ShaderModuleCreateInfo.codeSize = code.size();
+		ShaderModuleCreateInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+
+		VkResult result = vkCreateShaderModule(_VkDevice, &ShaderModuleCreateInfo, nullptr, &_VkShaderModule);
+		if (result != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to create Shader Module");
+		}
+
+		return _VkShaderModule;
 	}
 }
