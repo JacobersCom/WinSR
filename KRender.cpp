@@ -429,8 +429,30 @@ namespace KE::RENDERER
 
 	KE::KReturn KRender::CreatePipeLine()
 	{
-		//auto VertShader = LoadShaders("")
-		//auto PixelShader = LoadShaders()
+		auto VertShaderCode = LoadShaders("VertShader.spv");
+		auto PixelShaderCode = LoadShaders("frag.spv");
+		
+		VkShaderModule VertModule = CreateShaderModule(VertShaderCode, VertModule);
+		VkShaderModule PixelModule = CreateShaderModule(PixelShaderCode, PixelModule);
+
+
+		VkPipelineShaderStageCreateInfo VertexStage{};
+		VertexStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+		VertexStage.stage = VK_SHADER_STAGE_VERTEX_BIT;
+		VertexStage.module = VertModule;
+		VertexStage.pName = "main";
+
+		VkPipelineShaderStageCreateInfo PixelStage{};
+		VertexStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+		VertexStage.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+		VertexStage.module = PixelModule;
+		VertexStage.pName = "main";
+
+		VkPipelineShaderStageCreateInfo ShaderStages[] = {VertexStage, PixelStage}
+		//Clean up
+		vkDestroyShaderModule(_VkDevice, VertModule, nullptr);
+		vkDestroyShaderModule(_VkDevice, PixelModule, nullptr);
+
 	}
 
 	std::vector<const char*> KRender::GetRequiredInstanceExtensions()
