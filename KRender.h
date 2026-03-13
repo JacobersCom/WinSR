@@ -69,6 +69,9 @@ namespace KE::RENDERER
 		KE::RENDERER::QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice _VkPhysicalDevice);
 		KE::RENDERER::QueueFamilyIndices GetQueueFamilyIndices(VkPhysicalDevice _VkPhysicalDevice);
 		
+		//PipeLine Helpers
+		VkPipelineDynamicStateCreateInfo CreateDynaminceStateInfo(int DynamicStateCount, VkDynamicState* DynamicStateData);
+
 
 		//All SwapChain helpers
 		KE::RENDERER::SwapChainSupportDetails GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice);
@@ -79,16 +82,19 @@ namespace KE::RENDERER
 
 		//All Shader helpers
 		//Takes in the a spv compiled shader
-		std::vector<char> LoadShaders(const std::string& _FileName);
+		std::vector<char> LoadShader(const std::string& _FileName);
 		//Takes in the return from LoadShaders
 		VkShaderModule CreateShaderModule(const std::vector<char>& code);
 
+		//Checks for Device suitability and extension support
 		bool IsDeviceSuitable(VkPhysicalDevice _VkPhyscialDevice);
-		//Called from is Device Suitable
 		bool CheckDeviceExtensionSupport(VkPhysicalDevice _VkPhysicalDevice);
+		
+		//Helpers for required information
 		std::vector<const char*> GetRequiredInstanceExtensions();
 		std::vector<const char*> GetRequiredInstaceLayers();
 		std::vector<const char*> GetRequiredDeviceExtensions();
+		
 
 
 	private:
@@ -109,5 +115,6 @@ namespace KE::RENDERER
 		std::vector<const char*> deviceExtensions;
 		std::vector<VkImage> SwapChainImages;
 		std::vector<VkImageView> ImageViews;
+		std::vector<VkDynamicState> DynamicStates;
 	};
 }

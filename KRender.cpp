@@ -174,6 +174,20 @@ namespace KE::RENDERER
 		return indices;
 	}
 
+	//Allows different parts of the renderer to be dynamic instead of fixed during draw time
+	//Current dynamic states
+	//-Dynamic view port
+	//-Dynamic scissor
+	VkPipelineDynamicStateCreateInfo KRender::CreateDynaminceStateInfo(int DynamicStateCount, VkDynamicState* DynamicStateData)
+	{
+		VkPipelineDynamicStateCreateInfo DynamicStateInfo{};
+		DynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+		DynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(DynamicStateCount);
+		DynamicStateInfo.pDynamicStates = DynamicStateData;
+
+		return DynamicStateInfo;
+	}
+
 	KE::RENDERER::SwapChainSupportDetails KRender::GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice)
 	{
 		SwapChainSupportDetails SwapChainDetails;
@@ -253,7 +267,6 @@ namespace KE::RENDERER
 
 		}
 	}
-
 
 	KE::KReturn KE::RENDERER::KRender::CreateLogicalDevice(VkPhysicalDevice _VkPhysicalDevice, VkDevice& _VkDevice)
 	{
@@ -414,8 +427,8 @@ namespace KE::RENDERER
 
 	KE::KReturn KRender::CreatePipeLine()
 	{
-		auto VertShaderCode = LoadShaders("VertShader.spv");
-		auto PixelShaderCode = LoadShaders("frag.spv");
+		auto VertShaderCode = LoadShader("VertShader.spv");
+		auto PixelShaderCode = LoadShader("frag.spv");
 		
 		VkShaderModule VertModule = CreateShaderModule(VertShaderCode);
 		VkShaderModule PixelModule = CreateShaderModule(PixelShaderCode);
@@ -438,6 +451,14 @@ namespace KE::RENDERER
 		vkDestroyShaderModule(_VkDevice, VertModule, nullptr);
 		vkDestroyShaderModule(_VkDevice, PixelModule, nullptr);
 
+		DynamicStates = {
+			VK_DYNAMIC_STATE_SCISSOR,
+			VK_DYNAMIC_STATE_VIEWPORT
+		};
+
+		VkPipelineDynamicStateCreateInfo DynamicStateInfo = CreateDynaminceStateInfo(DynamicStates.size(), DynamicStates.data());
+
+		return KReturn::K_SUCCESS;
 	}
 
 	std::vector<const char*> KRender::GetRequiredInstanceExtensions()
@@ -491,7 +512,7 @@ namespace KE::RENDERER
 		return Indices.isComplete() && SwapChainAdequate && extensionsSupported;
 	}
 
-	std::vector<char> KRender::LoadShaders(const std::string& _FileName)
+	std::vector<char> KRender::LoadShader(const std::string& _FileName)
 	{
 		//Starts reading at the end of the file
 		std::ifstream file(_FileName, std::ios::ate | std::ios::binary);
