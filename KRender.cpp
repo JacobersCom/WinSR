@@ -188,6 +188,30 @@ namespace KE::RENDERER
 		return DynamicStateInfo;
 	}
 
+	//Set the VertexInputState for the pipeline
+	VkPipelineVertexInputStateCreateInfo KRender::CreateVertexInputStateInfo()
+	{
+		VkPipelineVertexInputStateCreateInfo VertexStateInfo{};
+		VertexStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+		VertexStateInfo.pVertexAttributeDescriptions = nullptr;
+		VertexStateInfo.pVertexBindingDescriptions = nullptr;
+		VertexStateInfo.vertexAttributeDescriptionCount = 0;
+		VertexStateInfo.vertexBindingDescriptionCount = 0;
+		return VertexStateInfo;
+	}
+
+	//Handles how shapes are drawn.
+	//PrimitiveRestart allows you to break up strips
+	VkPipelineInputAssemblyStateCreateInfo KRender::CreateAssemblyInputStateInfo()
+	{
+		VkPipelineInputAssemblyStateCreateInfo AssemblyStateInfo{};
+		AssemblyStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+		AssemblyStateInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+		AssemblyStateInfo.primitiveRestartEnable = VK_FALSE;
+
+		return AssemblyStateInfo;
+	}
+
 	KE::RENDERER::SwapChainSupportDetails KRender::GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice)
 	{
 		SwapChainSupportDetails SwapChainDetails;
@@ -447,9 +471,10 @@ namespace KE::RENDERER
 		VertexStage.pName = "main";
 
 		VkPipelineShaderStageCreateInfo ShaderStages[] = { VertexStage, PixelStage };
-		//Clean up
-		vkDestroyShaderModule(_VkDevice, VertModule, nullptr);
-		vkDestroyShaderModule(_VkDevice, PixelModule, nullptr);
+
+		VkPipelineVertexInputStateCreateInfo VertexInput = CreateVertexInputStateInfo();
+
+		VkPipelineInputAssemblyStateCreateInfo AssemblyInput = CreateAssemblyInputStateInfo();
 
 		DynamicStates = {
 			VK_DYNAMIC_STATE_SCISSOR,
@@ -457,6 +482,11 @@ namespace KE::RENDERER
 		};
 
 		VkPipelineDynamicStateCreateInfo DynamicStateInfo = CreateDynaminceStateInfo(DynamicStates.size(), DynamicStates.data());
+
+		//Clean up
+		vkDestroyShaderModule(_VkDevice, VertModule, nullptr);
+		vkDestroyShaderModule(_VkDevice, PixelModule, nullptr);
+
 
 		return KReturn::K_SUCCESS;
 	}
