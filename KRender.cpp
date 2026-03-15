@@ -17,6 +17,7 @@ namespace KE::RENDERER
 		KE::RENDERER::KRender::PickPhysicalDevice(_VkPhysicalDevice, _VkInstance);
 		KE::RENDERER::KRender::CreateLogicalDevice(_VkPhysicalDevice, _VkDevice);
 		KE::RENDERER::KRender::CreateSwapChain(_VkPhysicalDevice, _VkDevice, _VkSwapChain);
+		KE::RENDERER::KRender::CreatePipeLine();
 
 		return KE::KReturn::K_SUCCESS;
 	}
