@@ -35,6 +35,7 @@ namespace KE::RENDERER
 		{
 			vkDestroyImageView(_VkDevice, ImageView, nullptr);
 		}
+		vkDestroyPipelineLayout(_VkDevice, _VkPipelineLayout, nullptr);
 		vkDestroyDevice(_VkDevice, nullptr);
 	}
 
@@ -541,6 +542,20 @@ namespace KE::RENDERER
 		};
 
 		VkPipelineDynamicStateCreateInfo DynamicStateInfo = CreateDynaminceStateInfo(DynamicStates.size(), DynamicStates.data());
+
+		VkPipelineLayoutCreateInfo PipelineInfo{};
+		PipelineInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+		PipelineInfo.setLayoutCount = 0;
+		PipelineInfo.pSetLayouts = nullptr;
+		PipelineInfo.pushConstantRangeCount = 0;
+		PipelineInfo.pPushConstantRanges = nullptr;
+
+		VkResult result = vkCreatePipelineLayout(_VkDevice, &PipelineInfo, nullptr, &_VkPipelineLayout);
+
+		if (result != VK_SUCCESS)
+		{
+			throw std::runtime_error("Failed to create pipeline layout");
+		}
 
 		//Clean up
 		vkDestroyShaderModule(_VkDevice, VertModule, nullptr);

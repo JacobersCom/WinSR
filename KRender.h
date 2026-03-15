@@ -113,6 +113,7 @@ namespace KE::RENDERER
 		VkSwapchainKHR _VkSwapChain;
 		VkFormat _VkSwapChainFormat;
 		VkExtent2D _VkSwapChainExtent;
+		VkPipelineLayout _VkPipelineLayout;
 
 		std::vector<const char*> validationLayers;
 		std::vector<const char*> InstanceExtensions;
