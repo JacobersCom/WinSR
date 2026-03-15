@@ -256,6 +256,21 @@ namespace KE::RENDERER
 		return RasterStateInfo;
 	}
 
+	VkPipelineColorBlendAttachmentState KRender::CreateColorBlendAttachmentState()
+	{
+		//Alpha blending
+		VkPipelineColorBlendAttachmentState ColorBlendState{};
+		ColorBlendState.blendEnable = VK_TRUE;
+		ColorBlendState.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+		ColorBlendState.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+		ColorBlendState.colorBlendOp = VK_BLEND_OP_ADD;
+		ColorBlendState.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+		ColorBlendState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+		ColorBlendState.alphaBlendOp = VK_BLEND_OP_ADD;
+
+		return  ColorBlendState;
+	}
+
 	KE::RENDERER::SwapChainSupportDetails KRender::GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice)
 	{
 		SwapChainSupportDetails SwapChainDetails;

@@ -74,6 +74,8 @@ namespace KE::RENDERER
 		VkPipelineVertexInputStateCreateInfo CreateVertexInputStateInfo();
 		VkPipelineInputAssemblyStateCreateInfo CreateAssemblyInputStateInfo();
 		VkPipelineViewportStateCreateInfo CreateViewPort();
+		VkPipelineRasterizationStateCreateInfo CreateRasterizationState();
+		VkPipelineColorBlendAttachmentState CreateColorBlendAttachmentState();
 
 		//All SwapChain helpers
 		KE::RENDERER::SwapChainSupportDetails GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice);
