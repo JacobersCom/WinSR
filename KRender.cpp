@@ -236,6 +236,26 @@ namespace KE::RENDERER
 		return ViewPortInfo;
 	}
 
+	VkPipelineRasterizationStateCreateInfo KRender::CreateRasterizationState()
+	{
+		VkPipelineRasterizationStateCreateInfo RasterStateInfo{};
+		RasterStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+		RasterStateInfo.depthClampEnable = VK_FALSE; // Using this requires enabling VkPipelineRasterizationDepthClipStateCreateInfoEXT within the pipeline
+		RasterStateInfo.rasterizerDiscardEnable = VK_FALSE; // if trust it stops everything from reaching the frame buffer
+		RasterStateInfo.polygonMode = VK_POLYGON_MODE_FILL;
+		RasterStateInfo.lineWidth = 1.f; //Anything thicker than 1.f requries a gpu feature
+		//Determines the type of face culling to use
+		RasterStateInfo.cullMode = VK_CULL_MODE_BACK_BIT; 
+		RasterStateInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
+
+		RasterStateInfo.depthBiasEnable = VK_FALSE;
+		RasterStateInfo.depthBiasConstantFactor = 0.0f; 
+		RasterStateInfo.depthBiasClamp = 0.0f; 
+		RasterStateInfo.depthBiasSlopeFactor = 0.0f; 
+
+		return RasterStateInfo;
+	}
+
 	KE::RENDERER::SwapChainSupportDetails KRender::GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice)
 	{
 		SwapChainSupportDetails SwapChainDetails;
