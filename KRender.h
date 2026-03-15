@@ -73,6 +73,7 @@ namespace KE::RENDERER
 		VkPipelineDynamicStateCreateInfo CreateDynaminceStateInfo(int DynamicStateCount, VkDynamicState* DynamicStateData);
 		VkPipelineVertexInputStateCreateInfo CreateVertexInputStateInfo();
 		VkPipelineInputAssemblyStateCreateInfo CreateAssemblyInputStateInfo();
+		VkPipelineViewportStateCreateInfo CreateViewPort();
 
 		//All SwapChain helpers
 		KE::RENDERER::SwapChainSupportDetails GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice);

@@ -212,6 +212,30 @@ namespace KE::RENDERER
 		return AssemblyStateInfo;
 	}
 
+	VkPipelineViewportStateCreateInfo KRender::CreateViewPort()
+	{
+		VkViewport viewport{};
+		viewport.x = 0.0f;
+		viewport.y = 0.0f;
+		viewport.width = static_cast<float>(_VkSwapChainExtent.width);
+		viewport.height = static_cast<float>(_VkSwapChainExtent.height);
+		viewport.minDepth = 0.0f;
+		viewport.maxDepth = 1.0f;
+
+		VkRect2D scissor{};
+		scissor.offset = { 0, 0 };
+		scissor.extent = _VkSwapChainExtent;
+
+		VkPipelineViewportStateCreateInfo ViewPortInfo{};
+		ViewPortInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+		ViewPortInfo.viewportCount = static_cast<uint32_t>(1);
+		ViewPortInfo.pViewports = &viewport;
+		ViewPortInfo.scissorCount = static_cast<uint32_t>(1);
+		ViewPortInfo.pScissors = &scissor;
+
+		return ViewPortInfo;
+	}
+
 	KE::RENDERER::SwapChainSupportDetails KRender::GetSwapChainDetails(VkPhysicalDevice _VkPhysicalDevice)
 	{
 		SwapChainSupportDetails SwapChainDetails;
